@@ -92,11 +92,11 @@ public partial class MainViewModel : ObservableObject
 
         string q = e.Kind switch
         {
-            EventKind.Blueprint => $"{term} blueprint site:sc-craft.tools OR site:scmdb.net",
+            EventKind.Blueprint => $"Star Citizen {term} blueprint",
             EventKind.Vehicle or EventKind.ShipLoss or EventKind.Quantum => $"Star Citizen {term} ship",
             EventKind.Sale or EventKind.Purchase => $"Star Citizen {term} item",
-            EventKind.Trade => $"Star Citizen {term} commodity uexcorp",
-            EventKind.Mission => $"Star Citizen mission {term} site:scmdb.net",
+            EventKind.Trade => $"Star Citizen {term} commodity",
+            EventKind.Mission => $"Star Citizen {term} mission",
             EventKind.Location => $"Star Citizen {term} location",
             _ => $"Star Citizen {term}"
         };
