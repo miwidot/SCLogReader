@@ -208,6 +208,9 @@ public partial class MainViewModel : ObservableObject
     }
 
     long _running;
+    bool _allMode;     // „Alle Sessions": DB-Basis + Live-Session oben drauf
+    System.Collections.Generic.List<LogEntry> _dbTop = new();
+    readonly System.Collections.Generic.List<LogEntry> _liveMoney = new();
 
     long StartBalance()
     {
@@ -434,27 +437,16 @@ public partial class MainViewModel : ObservableObject
                 Database.Init();
                 int added = Database.IndexNew(archived);
 
-                // 4) Summen/Top per SQL (kein Vollladen)
+                // 4) Summen/Top/Tabelle per SQL (kein Vollladen)
                 var agg = Database.Aggregate();
                 var topDb = Database.TopMoney(40);
                 var recent = Database.RecentEvents(3000);
 
-                // 5) laufende Game.log einmal parsen (eine Session, klein)
-                var live = new System.Collections.Generic.List<LogEntry>();
-                if (File.Exists(liveLog))
-                {
-                    var parser = new LogParser();
-                    foreach (var line in ReadSharedLines(liveLog))
-                    {
-                        var e = parser.Feed(line);
-                        if (e != null) live.Add(e);
-                    }
-                }
-
-                Logger.Log($"Alle Sessions: {agg.Sessions} in DB ({added} neu indexiert) + {live.Count} live.");
+                Logger.Log($"Alle Sessions: {agg.Sessions} in DB ({added} neu indexiert).");
                 FlushUnknownNotifications();
 
-                Dispatcher.UIThread.Post(() => ApplyAggregate(agg, topDb, recent, live));
+                // 5) Basis aus DB setzen, dann laufende Game.log LIVE oben drauf tailen
+                Dispatcher.UIThread.Post(() => ApplyAggregate(agg, topDb, recent, liveLog));
             }
             catch (System.Exception ex)
             {
@@ -464,56 +456,35 @@ public partial class MainViewModel : ObservableObject
         });
     }
 
-    // Einmaliges UI-Update für die „Alle"-Ansicht aus SQL-Summen + Live-Session.
+    // Basis für „Alle": Summen aus DB setzen, dann laufende Game.log live drauf tailen.
     void ApplyAggregate(Database.Agg agg, System.Collections.Generic.List<LogEntry> topDb,
-                        System.Collections.Generic.List<LogEntry> recent, System.Collections.Generic.List<LogEntry> live)
+                        System.Collections.Generic.List<LogEntry> recent, string liveLog)
     {
-        long lIn = 0, lRew = 0, lOut = 0, lPur = 0, lSale = 0, lTrade = 0;
-        foreach (var e in live)
-            switch (e.Kind)
-            {
-                case EventKind.TransferIn: lIn += e.Amount; break;
-                case EventKind.MissionReward: lRew += e.Amount; break;
-                case EventKind.Sale: lSale += e.Amount; break;
-                case EventKind.Trade: lTrade += e.Amount; break;
-                case EventKind.TransferOut: lOut += -e.Amount; break;
-                case EventKind.Purchase: lPur += -e.Amount; break;
-            }
+        _allMode = true;
+        _dbTop = topDb;
+        _liveMoney.Clear();
 
-        TotalIn = agg.In + lIn;
-        TotalReward = agg.Reward + lRew;
-        TotalSales = agg.Sales + lSale;
-        TotalTrade = agg.Trade + lTrade;
-        TotalOut = agg.Out + lOut;
-        TotalPurchases = agg.Purchases + lPur;
+        // Basis-Summen = nur fertige Sessions (DB). Live kommt per Tailer oben drauf.
+        TotalIn = agg.In; TotalReward = agg.Reward; TotalSales = agg.Sales;
+        TotalTrade = agg.Trade; TotalOut = agg.Out; TotalPurchases = agg.Purchases;
 
         RebuildBars();
+        SetTopTransactions(topDb.OrderByDescending(e => System.Math.Abs(e.Amount)).Take(8)
+                                 .OrderBy(e => System.Math.Abs(e.Amount)));
 
-        var topAll = topDb.Concat(live.Where(e => IsMoney(e.Kind)))
-                          .OrderByDescending(e => System.Math.Abs(e.Amount)).Take(8)
-                          .OrderBy(e => System.Math.Abs(e.Amount)).ToList();
-        SetTopTransactions(topAll);
-
-        foreach (var sh in agg.Ships.Concat(live.Where(e => !string.IsNullOrEmpty(e.Ship)).Select(e => e.Ship!)))
+        foreach (var sh in agg.Ships)
             if (_shipSet.Add(sh)) ShipsSeen.Add(sh);
 
-        // Tabelle: neueste ~4000 (DB + live), neueste zuerst
-        var rows = recent.Concat(live).OrderByDescending(e => e.Time).Take(4000).ToList();
+        // Tabelle: neueste ~3000 aus DB (neueste zuerst)
         Events.Clear();
-        foreach (var e in rows) Events.Add(e);
+        foreach (var e in recent.AsEnumerable().Reverse()) Events.Add(e);
 
-        CurrentLocation = rows.FirstOrDefault(e => e.Kind == EventKind.Location)?.Detail ?? "—";
-        CurrentShip = rows.FirstOrDefault(e => e.Kind == EventKind.Vehicle)?.Detail ?? "—";
-        LastInventory = rows.FirstOrDefault(e => e.Kind == EventKind.Inventory)?.Detail ?? "—";
+        CurrentLocation = Events.FirstOrDefault(e => e.Kind == EventKind.Location)?.Detail ?? "—";
+        CurrentShip = Events.FirstOrDefault(e => e.Kind == EventKind.Vehicle)?.Detail ?? "—";
+        LastInventory = Events.FirstOrDefault(e => e.Kind == EventKind.Inventory)?.Detail ?? "—";
 
         _sessionStart = agg.Start;
         _sessionEnd = agg.End;
-        if (live.Count > 0)
-        {
-            var ls = live.Min(e => e.Time); var le = live.Max(e => e.Time);
-            if (_sessionStart is null || ls < _sessionStart) _sessionStart = ls;
-            if (_sessionEnd is null || le > _sessionEnd) _sessionEnd = le;
-        }
         _running = StartBalance() + NetAll;
 
         foreach (var n in new[] { nameof(IncomeAll), nameof(SpendAll), nameof(NetAll), nameof(NetBalanceText),
@@ -521,7 +492,13 @@ public partial class MainViewModel : ObservableObject
                  nameof(SessionSpanText), nameof(FleetText), nameof(ShipsSeenText) })
             OnPropertyChanged(n);
 
-        Status = $"alle Sessions geladen (DB: {agg.Sessions} Sessions)";
+        Status = $"alle Sessions (DB: {agg.Sessions}) – laufende live…";
+
+        // laufende Game.log LIVE dazu tailen (zählt einmal oben drauf)
+        _tailer?.Stop();
+        _tailer = new LogTailer(liveLog);
+        _tailer.Line += OnLine;
+        _tailer.Start(fromStart: true);
     }
 
     static void FlushUnknownNotifications()
@@ -558,6 +535,9 @@ public partial class MainViewModel : ObservableObject
         CurrentLocation = CurrentShip = "—";
         LastInventory = "—";
         _sessionStart = _sessionEnd = null;
+        _allMode = false;
+        _dbTop = new System.Collections.Generic.List<LogEntry>();
+        _liveMoney.Clear();
         _running = StartBalance();
         OnPropertyChanged(nameof(NetBalanceText));
         OnPropertyChanged(nameof(NetSign));
@@ -692,7 +672,15 @@ public partial class MainViewModel : ObservableObject
                 _running += e.Amount;
                 e.BalanceAfter = _running;
                 e.HasBalance = true;
-                RebuildStats();
+                if (_allMode)
+                {
+                    _liveMoney.Add(e);
+                    RebuildBars();
+                    SetTopTransactions(_dbTop.Concat(_liveMoney)
+                        .OrderByDescending(x => System.Math.Abs(x.Amount)).Take(8)
+                        .OrderBy(x => System.Math.Abs(x.Amount)));
+                }
+                else RebuildStats();
             }
 
             // Flotte: Schiffe aus Vehicle- UND Quantum-Events sammeln
