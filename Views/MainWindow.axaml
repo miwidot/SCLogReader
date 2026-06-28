@@ -150,7 +150,13 @@
     <!-- Event-Tabelle -->
     <Border Classes="card" Padding="0">
       <DataGrid ItemsSource="{Binding EventsView}" IsReadOnly="True"
+                SelectedItem="{Binding SelectedEntry}" DoubleTapped="OnGridDoubleTapped"
                 CanUserResizeColumns="True" CanUserSortColumns="True" HeadersVisibility="Column">
+        <DataGrid.ContextMenu>
+          <ContextMenu>
+            <MenuItem Header="🔎  Online nachschlagen" Command="{Binding LookupCommand}" />
+          </ContextMenu>
+        </DataGrid.ContextMenu>
         <DataGrid.Columns>
           <DataGridTemplateColumn Header="ZEIT" Width="165" SortMemberPath="Time">
             <DataGridTemplateColumn.CellTemplate>

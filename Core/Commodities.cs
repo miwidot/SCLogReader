@@ -8,12 +8,9 @@ namespace SCLogReader.Core;
 /// UEX/Items kennen diese GUIDs nicht per uuid, daher lokale Tabelle
 /// (per Internet-Recherche befüllbar). Unbekannt → "Fracht".
 /// </summary>
-public static class Commodities
+public static partial class Commodities
 {
-    static readonly Dictionary<string, string> Map = new()
-    {
-        ["1b4c4042-5fdc-4b52-bec4-07085cb3520a"] = "Tin",
-    };
+    // Map kommt aus CommoditiesData.cs (auto-generiert aus scunpacked, 750+ Waren).
 
     public static string Resolve(string? guid)
     {

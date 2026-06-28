@@ -72,6 +72,44 @@ public partial class MainViewModel : ObservableObject
                             EventKind.Loadout, EventKind.Entitlement, EventKind.Inventory, EventKind.Gear, EventKind.Kill },
     };
 
+    [ObservableProperty] private LogEntry? selectedEntry;
+
+    // Zeile online nachschlagen (Schiff/Bauplan/Item/Ware) – öffnet eine gezielte Web-Suche.
+    [RelayCommand]
+    private void Lookup()
+    {
+        var e = SelectedEntry;
+        if (e is null || string.IsNullOrWhiteSpace(e.Detail)) return;
+
+        // Detail von Zusätzen befreien (×1 · Shop, (bei …), – Kollision …)
+        var term = e.Detail;
+        foreach (var sep in new[] { "  ·", "  ", " ·", " (", " – ", " - " })
+        {
+            var i = term.IndexOf(sep, System.StringComparison.Ordinal);
+            if (i > 2) term = term[..i];
+        }
+        term = term.Trim();
+
+        string q = e.Kind switch
+        {
+            EventKind.Blueprint => $"{term} blueprint site:sc-craft.tools OR site:scmdb.net",
+            EventKind.Vehicle or EventKind.ShipLoss or EventKind.Quantum => $"Star Citizen {term} ship",
+            EventKind.Sale or EventKind.Purchase => $"Star Citizen {term} item",
+            EventKind.Trade => $"Star Citizen {term} commodity uexcorp",
+            EventKind.Mission => $"Star Citizen mission {term} site:scmdb.net",
+            EventKind.Location => $"Star Citizen {term} location",
+            _ => $"Star Citizen {term}"
+        };
+
+        OpenUrl("https://www.google.com/search?q=" + System.Uri.EscapeDataString(q));
+    }
+
+    static void OpenUrl(string url)
+    {
+        try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true }); }
+        catch (System.Exception ex) { Logger.Error("OpenUrl", ex); }
+    }
+
     [RelayCommand]
     private void SetBalance()
     {
