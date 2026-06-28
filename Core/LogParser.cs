@@ -120,6 +120,9 @@ public class LogParser
     /// <summary>Session-Metadaten (Build, Hardware, Charakter, Shard, …).</summary>
     public System.Collections.Generic.Dictionary<string, string> Meta { get; } = new();
 
+    /// <summary>Unbekannte Notification-Typen (Diagnose: was decken wir noch nicht ab?).</summary>
+    public static readonly System.Collections.Concurrent.ConcurrentDictionary<string, int> Unknown = new();
+
     public LogEntry? Feed(string line)
     {
         CaptureMeta(line);
@@ -375,6 +378,9 @@ public class LogParser
             var kind = Categorize(txt);
             if (kind != null)
                 return new LogEntry { Time = ParseTs(line), Kind = kind.Value, Detail = txt };
+
+            // unbekannte Notification -> für Diagnose merken (Debug-Log)
+            Unknown.AddOrUpdate(txt, 1, (_, c) => c + 1);
         }
 
         return null;

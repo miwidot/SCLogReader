@@ -400,32 +400,61 @@ public partial class MainViewModel : ObservableObject
         Running = true;
     }
 
-    // Alle Logs (aktuell + Backups) chronologisch zusammen einlesen.
+    // Alle Sessions: fertige aus der DB (einmal indexiert), laufende live dazu.
     void LoadAllSessions()
     {
         Running = true;
-        Status = "lese alle Sessions…";
-        var files = SessionScanner.Scan(LogPath)
-            .Where(s => !s.IsAll)
-            .OrderBy(s => s.Start)
-            .Select(s => s.Path)
-            .ToList();
+        Status = "lade Archiv…";
+        var liveLog = LogPath;
+        var dir = Path.GetDirectoryName(liveLog) ?? ".";
+        var backupDir = Path.Combine(dir, "logbackups");
 
         Task.Run(() =>
         {
-            int n = 0;
-            foreach (var f in files)
+            try
             {
-                var parser = new LogParser();   // pro Datei frischer Zustand
-                foreach (var line in ReadSharedLines(f))
+                var backups = Directory.Exists(backupDir)
+                    ? Directory.GetFiles(backupDir, "*.log")
+                    : System.Array.Empty<string>();
+
+                // 1) Roh-Logs archivieren, 2) DB öffnen, 3) nur Neues indexieren
+                var archived = LogArchive.Sync(backups);
+                Database.Init();
+                int added = Database.IndexNew(archived);
+                Logger.Log($"Alle Sessions: {Database.SessionCount()} in DB ({added} neu indexiert).");
+
+                // 4) fertige Sessions aus der DB
+                foreach (var e in Database.LoadAllEvents())
+                    Dispatcher.UIThread.Post(() => Apply(e));
+
+                // 5) laufende Game.log live dazu (noch nicht in DB)
+                if (File.Exists(liveLog))
                 {
-                    var e = parser.Feed(line);
-                    if (e != null) Dispatcher.UIThread.Post(() => Apply(e));
+                    var parser = new LogParser();
+                    foreach (var line in ReadSharedLines(liveLog))
+                    {
+                        var e = parser.Feed(line);
+                        if (e != null) Dispatcher.UIThread.Post(() => Apply(e));
+                    }
                 }
-                n++;
+
+                FlushUnknownNotifications();
+                Dispatcher.UIThread.Post(() => Status = $"alle Sessions geladen (DB: {Database.SessionCount()})");
             }
-            Dispatcher.UIThread.Post(() => Status = $"alle {n} Sessions geladen");
+            catch (System.Exception ex)
+            {
+                Logger.Error("LoadAllSessions", ex);
+                Dispatcher.UIThread.Post(() => Status = "Fehler beim Laden – siehe SCLogReader.debug.log");
+            }
         });
+    }
+
+    static void FlushUnknownNotifications()
+    {
+        if (LogParser.Unknown.IsEmpty) return;
+        Logger.Log($"--- Unbekannte Notification-Typen ({LogParser.Unknown.Count}) – nach Häufigkeit ---");
+        foreach (var kv in LogParser.Unknown.OrderByDescending(k => k.Value))
+            Logger.Log($"  {kv.Value,5}x  {kv.Key}");
     }
 
     static System.Collections.Generic.IEnumerable<string> ReadSharedLines(string file)

@@ -25,13 +25,14 @@ internal static class Program
             return;
         }
 
+        Core.Logger.Log($"GUI-Start · {Environment.OSVersion}");
         try
         {
             BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
         }
         catch (Exception ex)
         {
-            File.WriteAllText(Path.Combine(Path.GetTempPath(), "sclr_crash.txt"), ex.ToString());
+            Core.Logger.Error("FATAL", ex);
             throw;
         }
     }
