@@ -134,6 +134,94 @@ public static class Database
         return Convert.ToInt32(Scalar(db, "SELECT COUNT(*) FROM sessions") ?? 0);
     }
 
+    public class Agg
+    {
+        public long In, Reward, Out, Purchases, Sales, Trade;
+        public DateTime? Start, End;
+        public int Sessions;
+        public List<string> Ships = new();
+    }
+
+    /// <summary>Summen per SQL (kein Vollladen der Events).</summary>
+    public static Agg Aggregate()
+    {
+        var a = new Agg();
+        using var db = new SqliteConnection(Conn);
+        db.Open();
+
+        using (var c = db.CreateCommand())
+        {
+            c.CommandText = "SELECT kind, COALESCE(SUM(amount),0) FROM events GROUP BY kind";
+            using var r = c.ExecuteReader();
+            while (r.Read())
+            {
+                var kind = r.GetString(0);
+                var sum = r.GetInt64(1);
+                switch (kind)
+                {
+                    case "TransferIn": a.In = sum; break;
+                    case "MissionReward": a.Reward = sum; break;
+                    case "Sale": a.Sales = sum; break;
+                    case "Trade": a.Trade = sum; break;
+                    case "TransferOut": a.Out = -sum; break;   // Beträge negativ -> positiv
+                    case "Purchase": a.Purchases = -sum; break;
+                }
+            }
+        }
+
+        a.Sessions = Convert.ToInt32(Scalar(db, "SELECT COUNT(*) FROM sessions") ?? 0);
+        if (Scalar(db, "SELECT MIN(time) FROM events") is string mn && DateTime.TryParse(mn, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out var s)) a.Start = s;
+        if (Scalar(db, "SELECT MAX(time) FROM events") is string mx && DateTime.TryParse(mx, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out var e)) a.End = e;
+
+        using (var c = db.CreateCommand())
+        {
+            c.CommandText = "SELECT DISTINCT ship FROM events WHERE ship IS NOT NULL ORDER BY ship";
+            using var r = c.ExecuteReader();
+            while (r.Read()) a.Ships.Add(r.GetString(0));
+        }
+        return a;
+    }
+
+    /// <summary>Größte Geld-Posten per SQL.</summary>
+    public static List<LogEntry> TopMoney(int n)
+    {
+        var list = new List<LogEntry>();
+        using var db = new SqliteConnection(Conn);
+        db.Open();
+        using var c = db.CreateCommand();
+        c.CommandText = @"SELECT kind,amount,detail FROM events
+                          WHERE kind IN ('TransferIn','TransferOut','MissionReward','Purchase','Sale','Trade')
+                          ORDER BY ABS(amount) DESC LIMIT $n";
+        c.Parameters.AddWithValue("$n", n);
+        using var r = c.ExecuteReader();
+        while (r.Read())
+        {
+            Enum.TryParse<EventKind>(r.GetString(0), out var kind);
+            list.Add(new LogEntry { Kind = kind, Amount = r.GetInt64(1), Detail = r.IsDBNull(2) ? "" : r.GetString(2) });
+        }
+        return list;
+    }
+
+    /// <summary>Neueste N Events (für die Tabelle), chronologisch.</summary>
+    public static List<LogEntry> RecentEvents(int n)
+    {
+        var list = new List<LogEntry>();
+        using var db = new SqliteConnection(Conn);
+        db.Open();
+        using var c = db.CreateCommand();
+        c.CommandText = "SELECT time,kind,amount,detail,ship FROM events ORDER BY time DESC LIMIT $n";
+        c.Parameters.AddWithValue("$n", n);
+        using var r = c.ExecuteReader();
+        while (r.Read())
+        {
+            DateTime.TryParse(r.GetString(0), CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out var t);
+            Enum.TryParse<EventKind>(r.GetString(1), out var kind);
+            list.Add(new LogEntry { Time = t, Kind = kind, Amount = r.GetInt64(2), Detail = r.IsDBNull(3) ? "" : r.GetString(3), Ship = r.IsDBNull(4) ? null : r.GetString(4) });
+        }
+        list.Reverse();
+        return list;
+    }
+
     // ---- Helfer ----
     static IEnumerable<string> ReadShared(string file)
     {

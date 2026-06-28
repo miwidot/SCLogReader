@@ -120,6 +120,33 @@ public partial class MainViewModel : ObservableObject
 
     void RebuildStats()
     {
+        RebuildBars();
+        // Top aus der aktuellen Events-Liste (Live-/Einzelsession)
+        var top = Events.Where(e => IsMoney(e.Kind))
+                        .OrderByDescending(e => System.Math.Abs(e.Amount))
+                        .Take(8)
+                        .OrderBy(e => System.Math.Abs(e.Amount))
+                        .ToList();
+        SetTopTransactions(top);
+    }
+
+    void SetTopTransactions(System.Collections.Generic.IEnumerable<LogEntry> events)
+    {
+        long max = 1;
+        foreach (var e in events) max = System.Math.Max(max, System.Math.Abs(e.Amount));
+        TopTransactions.Clear();
+        foreach (var e in events)
+            TopTransactions.Add(new StatItem
+            {
+                Label = $"{e.KindText}: {e.Detail}",
+                Value = e.Amount,
+                BarWidth = System.Math.Abs(e.Amount) / (double)max * BarMax,
+                Color = Brush(e.Amount >= 0 ? "#4ADE80" : "#F87171")
+            });
+    }
+
+    void RebuildBars()
+    {
         var inc = new (string L, long V, string C)[]
         {
             ("Transfers rein", TotalIn,    "#4ADE80"),
@@ -144,21 +171,6 @@ public partial class MainViewModel : ObservableObject
         SpendStats.Clear();
         foreach (var x in spd.Where(i => i.V > 0).OrderByDescending(i => i.V))
             SpendStats.Add(new StatItem { Label = x.L, Value = x.V, BarWidth = x.V / (double)max * BarMax, Color = Brush(x.C) });
-
-        TopTransactions.Clear();
-        // Top 8 nach Größe wählen, aber aufsteigend anzeigen (Größter unten)
-        var top = Events.Where(e => IsMoney(e.Kind))
-                        .OrderByDescending(e => System.Math.Abs(e.Amount))
-                        .Take(8)
-                        .OrderBy(e => System.Math.Abs(e.Amount));
-        foreach (var e in top)
-            TopTransactions.Add(new StatItem
-            {
-                Label = $"{e.KindText}: {e.Detail}",
-                Value = e.Amount,
-                BarWidth = System.Math.Abs(e.Amount) / (double)max * BarMax,
-                Color = Brush(e.Amount >= 0 ? "#4ADE80" : "#F87171")
-            });
 
         OnPropertyChanged(nameof(IncomeTotalText));
         OnPropertyChanged(nameof(SpendTotalText));
@@ -421,25 +433,28 @@ public partial class MainViewModel : ObservableObject
                 var archived = LogArchive.Sync(backups);
                 Database.Init();
                 int added = Database.IndexNew(archived);
-                Logger.Log($"Alle Sessions: {Database.SessionCount()} in DB ({added} neu indexiert).");
 
-                // 4) fertige Sessions aus der DB
-                foreach (var e in Database.LoadAllEvents())
-                    Dispatcher.UIThread.Post(() => Apply(e));
+                // 4) Summen/Top per SQL (kein Vollladen)
+                var agg = Database.Aggregate();
+                var topDb = Database.TopMoney(40);
+                var recent = Database.RecentEvents(3000);
 
-                // 5) laufende Game.log live dazu (noch nicht in DB)
+                // 5) laufende Game.log einmal parsen (eine Session, klein)
+                var live = new System.Collections.Generic.List<LogEntry>();
                 if (File.Exists(liveLog))
                 {
                     var parser = new LogParser();
                     foreach (var line in ReadSharedLines(liveLog))
                     {
                         var e = parser.Feed(line);
-                        if (e != null) Dispatcher.UIThread.Post(() => Apply(e));
+                        if (e != null) live.Add(e);
                     }
                 }
 
+                Logger.Log($"Alle Sessions: {agg.Sessions} in DB ({added} neu indexiert) + {live.Count} live.");
                 FlushUnknownNotifications();
-                Dispatcher.UIThread.Post(() => Status = $"alle Sessions geladen (DB: {Database.SessionCount()})");
+
+                Dispatcher.UIThread.Post(() => ApplyAggregate(agg, topDb, recent, live));
             }
             catch (System.Exception ex)
             {
@@ -447,6 +462,66 @@ public partial class MainViewModel : ObservableObject
                 Dispatcher.UIThread.Post(() => Status = "Fehler beim Laden – siehe SCLogReader.debug.log");
             }
         });
+    }
+
+    // Einmaliges UI-Update für die „Alle"-Ansicht aus SQL-Summen + Live-Session.
+    void ApplyAggregate(Database.Agg agg, System.Collections.Generic.List<LogEntry> topDb,
+                        System.Collections.Generic.List<LogEntry> recent, System.Collections.Generic.List<LogEntry> live)
+    {
+        long lIn = 0, lRew = 0, lOut = 0, lPur = 0, lSale = 0, lTrade = 0;
+        foreach (var e in live)
+            switch (e.Kind)
+            {
+                case EventKind.TransferIn: lIn += e.Amount; break;
+                case EventKind.MissionReward: lRew += e.Amount; break;
+                case EventKind.Sale: lSale += e.Amount; break;
+                case EventKind.Trade: lTrade += e.Amount; break;
+                case EventKind.TransferOut: lOut += -e.Amount; break;
+                case EventKind.Purchase: lPur += -e.Amount; break;
+            }
+
+        TotalIn = agg.In + lIn;
+        TotalReward = agg.Reward + lRew;
+        TotalSales = agg.Sales + lSale;
+        TotalTrade = agg.Trade + lTrade;
+        TotalOut = agg.Out + lOut;
+        TotalPurchases = agg.Purchases + lPur;
+
+        RebuildBars();
+
+        var topAll = topDb.Concat(live.Where(e => IsMoney(e.Kind)))
+                          .OrderByDescending(e => System.Math.Abs(e.Amount)).Take(8)
+                          .OrderBy(e => System.Math.Abs(e.Amount)).ToList();
+        SetTopTransactions(topAll);
+
+        foreach (var sh in agg.Ships.Concat(live.Where(e => !string.IsNullOrEmpty(e.Ship)).Select(e => e.Ship!)))
+            if (_shipSet.Add(sh)) ShipsSeen.Add(sh);
+
+        // Tabelle: neueste ~4000 (DB + live), neueste zuerst
+        var rows = recent.Concat(live).OrderByDescending(e => e.Time).Take(4000).ToList();
+        Events.Clear();
+        foreach (var e in rows) Events.Add(e);
+
+        CurrentLocation = rows.FirstOrDefault(e => e.Kind == EventKind.Location)?.Detail ?? "—";
+        CurrentShip = rows.FirstOrDefault(e => e.Kind == EventKind.Vehicle)?.Detail ?? "—";
+        LastInventory = rows.FirstOrDefault(e => e.Kind == EventKind.Inventory)?.Detail ?? "—";
+
+        _sessionStart = agg.Start;
+        _sessionEnd = agg.End;
+        if (live.Count > 0)
+        {
+            var ls = live.Min(e => e.Time); var le = live.Max(e => e.Time);
+            if (_sessionStart is null || ls < _sessionStart) _sessionStart = ls;
+            if (_sessionEnd is null || le > _sessionEnd) _sessionEnd = le;
+        }
+        _running = StartBalance() + NetAll;
+
+        foreach (var n in new[] { nameof(IncomeAll), nameof(SpendAll), nameof(NetAll), nameof(NetBalanceText),
+                 nameof(NetSign), nameof(FlowText), nameof(TradeText), nameof(ExpectedText), nameof(ExpectedBalance),
+                 nameof(SessionSpanText), nameof(FleetText), nameof(ShipsSeenText) })
+            OnPropertyChanged(n);
+
+        Status = $"alle Sessions geladen (DB: {agg.Sessions} Sessions)";
     }
 
     static void FlushUnknownNotifications()
