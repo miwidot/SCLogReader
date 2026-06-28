@@ -34,6 +34,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private bool updateAvailable;
     [ObservableProperty] private string updateText = "";
     Updater.Info? _update;
+    Avalonia.Threading.DispatcherTimer? _updateTimer;
     [ObservableProperty] private SessionInfo? selectedSession;
     [ObservableProperty] private string currentLocation = "—";
     [ObservableProperty] private string currentShip = "—";
@@ -262,7 +263,11 @@ public partial class MainViewModel : ObservableObject
         // Standard: gleich alle Sessions laden
         if (SelectedSession?.IsAll == true) LoadSession();
 
+        // Update-Prüfung: einmal beim Start + danach alle 6 Stunden
         CheckForUpdate();
+        _updateTimer = new Avalonia.Threading.DispatcherTimer { Interval = TimeSpan.FromHours(6) };
+        _updateTimer.Tick += (_, _) => CheckForUpdate();
+        _updateTimer.Start();
     }
 
     async void CheckForUpdate()
