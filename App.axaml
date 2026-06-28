@@ -1,0 +1,100 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="SCLogReader.App"
+             RequestedThemeVariant="Dark">
+
+  <Application.Styles>
+    <FluentTheme />
+    <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
+
+    <!-- Buttons -->
+    <Style Selector="Button.accent">
+      <Setter Property="Background" Value="#1F6FEB" />
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="Padding" Value="16,9" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="Button.accent:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#388BFD" />
+    </Style>
+
+    <Style Selector="Button.ghost">
+      <Setter Property="Background" Value="#21262D" />
+      <Setter Property="Foreground" Value="#C9D1D9" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="BorderBrush" Value="#30363D" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="Padding" Value="14,9" />
+    </Style>
+    <Style Selector="Button.ghost:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#30363D" />
+    </Style>
+
+    <!-- Eingabefeld -->
+    <Style Selector="TextBox.path">
+      <Setter Property="Background" Value="#0D1117" />
+      <Setter Property="BorderBrush" Value="#30363D" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="Padding" Value="10,9" />
+      <Setter Property="FontFamily" Value="Cascadia Code, Consolas, monospace" />
+      <Setter Property="FontSize" Value="12" />
+    </Style>
+
+    <!-- Filter-Chips -->
+    <Style Selector="Button.chip">
+      <Setter Property="Foreground" Value="#F0F6FC" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="CornerRadius" Value="14" />
+      <Setter Property="Padding" Value="14,7" />
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <!-- Karten -->
+    <Style Selector="Border.card">
+      <Setter Property="Background" Value="#161B22" />
+      <Setter Property="BorderBrush" Value="#21262D" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="12" />
+      <Setter Property="Padding" Value="16,12" />
+      <Setter Property="MinWidth" Value="150" />
+    </Style>
+    <Style Selector="Border.card TextBlock.label">
+      <Setter Property="Foreground" Value="#8B949E" />
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="LetterSpacing" Value="0.5" />
+    </Style>
+    <Style Selector="Border.card TextBlock.value">
+      <Setter Property="Foreground" Value="#F0F6FC" />
+      <Setter Property="FontSize" Value="17" />
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="Margin" Value="0,4,0,0" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <!-- DataGrid -->
+    <Style Selector="DataGrid">
+      <Setter Property="Background" Value="#0D1117" />
+      <Setter Property="RowBackground" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="BorderBrush" Value="#21262D" />
+      <Setter Property="GridLinesVisibility" Value="Horizontal" />
+      <Setter Property="HorizontalGridLinesBrush" Value="#161B22" />
+    </Style>
+    <Style Selector="DataGridColumnHeader">
+      <Setter Property="Background" Value="#161B22" />
+      <Setter Property="Foreground" Value="#8B949E" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Padding" Value="12,8" />
+    </Style>
+    <Style Selector="DataGridRow:pointerover /template/ Rectangle#BackgroundRectangle">
+      <Setter Property="Fill" Value="#161B22" />
+    </Style>
+    <Style Selector="DataGridCell">
+      <Setter Property="FontSize" Value="13" />
+    </Style>
+  </Application.Styles>
+</Application>
