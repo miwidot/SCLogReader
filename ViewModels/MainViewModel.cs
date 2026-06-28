@@ -178,6 +178,8 @@ public partial class MainViewModel : ObservableObject
 
     static IBrush Brush(string hex) => new SolidColorBrush(Color.Parse(hex));
 
+    public string VersionText => "v" + Updater.CurrentVersion;
+
     public string MetaSummary
     {
         get
