@@ -17,4 +17,17 @@ public partial class App : Application
 
         base.OnFrameworkInitializationCompleted();
     }
+
+    void TrayOpen(object? sender, System.EventArgs e)
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime d && d.MainWindow is { } w)
+        {
+            w.Show();
+            w.WindowState = Avalonia.Controls.WindowState.Normal;
+            w.Activate();
+        }
+    }
+
+    void TrayExit(object? sender, System.EventArgs e)
+        => (ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.Shutdown();
 }

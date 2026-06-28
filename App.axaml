@@ -3,6 +3,19 @@
              x:Class="SCLogReader.App"
              RequestedThemeVariant="Dark">
 
+  <TrayIcon.Icons>
+    <TrayIcons>
+      <TrayIcon Icon="/SCLogReader.ico" ToolTipText="SC Log Reader" Clicked="TrayOpen">
+        <TrayIcon.Menu>
+          <NativeMenu>
+            <NativeMenuItem Header="Öffnen" Click="TrayOpen" />
+            <NativeMenuItem Header="Beenden" Click="TrayExit" />
+          </NativeMenu>
+        </TrayIcon.Menu>
+      </TrayIcon>
+    </TrayIcons>
+  </TrayIcon.Icons>
+
   <Application.Styles>
     <FluentTheme />
     <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />

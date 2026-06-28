@@ -25,6 +25,14 @@ internal static class Program
             return;
         }
 
+        // Nur eine Instanz zulassen.
+        using var mutex = new System.Threading.Mutex(true, @"Global\SCLogReader_SingleInstance", out bool isNew);
+        if (!isNew)
+        {
+            Core.Logger.Log("Zweite Instanz blockiert – läuft bereits.");
+            return;
+        }
+
         Core.Logger.Log($"GUI-Start · {Environment.OSVersion}");
         try
         {

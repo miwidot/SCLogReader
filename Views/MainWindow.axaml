@@ -8,6 +8,7 @@
         Width="1040" Height="720"
         MinWidth="820" MinHeight="520"
         Background="#0D1117"
+        Icon="/SCLogReader.ico"
         Title="SC Log Reader">
 
   <Window.Resources>
