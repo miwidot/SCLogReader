@@ -5,6 +5,11 @@ Aufträge, Baupläne, Schiffe/Flotte, Crew, Tode, Ausrüstung u.v.m. — mit Fil
 Geld-Statistik, mitlaufendem Saldo und JSON/CSV-Export.
 Cross-platform (Avalonia / .NET 8), Windows-Single-`.exe`.
 
+> **Inoffizielles Community-/Fan-Projekt.** Nicht mit Cloud Imperium Games oder
+> Roberts Space Industries verbunden, von ihnen unterstützt oder autorisiert.
+> Liest **nur lokal** die `Game.log` (read-only) – kein Eingriff ins Spiel,
+> kein Memory-Zugriff, AntiCheat-konform. Siehe [Disclaimer](#disclaimer).
+
 ## Download
 Neueste `SCLogReader.exe` unter **[Releases](https://github.com/miwidot/SCLogReader/releases/latest)**
 — eine Datei, kein Setup, kein .NET nötig. Das Tool prüft beim Start automatisch auf
@@ -48,9 +53,9 @@ Item-Namen (Kauf/Verkauf) werden live über die **UEX-API**
 (`api.uexcorp.uk/2.0/items?uuid=<guid>`) aufgelöst — die `itemClassGUID` aus dem
 Log matcht direkt das UEX-`uuid`-Feld (z.B. `grin_tractor_01` → „MaxLift Tractor Beam").
 
-Fracht-`resourceGUID` lässt sich NICHT per UEX-uuid auflösen (dort `uuid:null`).
-Mapping daher in `Core/Commodities.cs` (per Internet-Recherche befüllt, z.B.
-`1b4c4042-… = Tin`). Unbekannt → „Fracht".
+Fracht-`resourceGUID` → Warenname über eine eingebackene Tabelle
+(`Core/CommoditiesData.cs`, ~750 Waren, auto-generiert aus **scunpacked** via
+`tools/gen-commodities.ps1`). Offline, kein Key.
 
 Geld-Buckets: Einnahmen = Transfers rein + Belohnungen + Verkäufe + Handel;
 Ausgaben = Transfers raus + Käufe. Verkäufe/Käufe sind Shop-*Requests* (mit
@@ -65,7 +70,6 @@ Ausgaben = Transfers raus + Käufe. Verkäufe/Käufe sind Shop-*Requests* (mit
 
 ## Bekannte Grenzen (Log-bedingt, nicht behebbar)
 - Lager nur als **Stückzahl**, kein Warenname / kein SCU.
-- Terminal-Käufe/-Verkäufe stehen **nicht** im Log — nur Spieler-Transfers + Rewards.
 - Quantum: nur **Ankunft** (Sprung abgeschlossen) sicher erkennbar; **Zielnamen**
   stehen nicht im Log (nur Schiff + zuletzt bekannter Standort als Kontext).
 - **Flotte/Schiffslager**: Die ASOP-Abfrage (`VehicleListQuery`) liefert nur eine
@@ -76,5 +80,27 @@ Ausgaben = Transfers raus + Käufe. Verkäufe/Käufe sind Shop-*Requests* (mit
 ## Struktur
 - `Core/LogTailer.cs` — Live-Lesen mit `FileShare.ReadWrite`, Rotations-Erkennung
 - `Core/LogParser.cs` — zustandsbehaftetes Zeilen-Parsing (Regex)
+- `Core/Database.cs` — SQLite-Index der Sessions (+ `LogArchive.cs` Roh-Log-Archiv)
 - `ViewModels/MainViewModel.cs` — MVVM, Summen + Live-Liste
 - `Views/MainWindow.axaml` — UI (Übersicht + DataGrid)
+
+## Disclaimer
+Dies ist ein **inoffizielles, von Fans erstelltes Community-Tool** und steht in
+**keiner Verbindung** zu Cloud Imperium Games (CIG) oder der Roberts Space
+Industries Group of Companies (RSI) und wird von diesen weder unterstützt noch
+gesponsert noch autorisiert.
+
+„Star Citizen", „Squadron 42", „Roberts Space Industries" und „Cloud Imperium"
+sind Marken der jeweiligen Inhaber. Alle Spiel-Inhalte und -Materialien gehören CIG.
+
+Das Tool liest ausschließlich die **lokale `Game.log`** (read-only) zur Auswertung
+deiner **eigenen** Spielsitzungen. Es verändert das Spiel nicht, greift nicht in
+den Spielprozess ein und liest keinen Speicher — daher AntiCheat-konform.
+Nutzung auf **eigene Verantwortung**, ohne jegliche Gewähr.
+
+Externe Daten: Item-Namen via [UEX](https://uexcorp.space) (API),
+Waren-/Spieldaten via [scunpacked](https://github.com/StarCitizenWiki/scunpacked-data).
+
+## Lizenz
+[MIT](LICENSE) — frei nutzbar, anpassbar und teilbar (mit Namensnennung).
+Beiträge willkommen.
