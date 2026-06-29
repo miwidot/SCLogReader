@@ -85,6 +85,7 @@ internal static class Program
         Console.WriteLine(new string('─', 60));
         var total = TimeSpan.FromTicks(all.Sum(s => (s.End - s.Start).Ticks));
         Console.WriteLine($"GESAMT ({all.Count} Sessions · Spielzeit {Dur(total)})");
+        Console.WriteLine($"   Aufträge abgeschlossen (Belohnung NICHT im Log): {all.Sum(s => s.MissionsDone)}");
         Console.WriteLine($"   Einnahmen {all.Sum(s => s.Income):N0}  ·  Ausgaben {all.Sum(s => s.Spend):N0}  ·  NETTO {all.Sum(s => s.Net):N0} aUEC");
         Console.WriteLine($"   Handel {all.Sum(s => s.Sales + s.Trade):N0}  ·  Käufe {all.Sum(s => s.Spent):N0}");
         Console.WriteLine("GRÖSSTE EINZEL-POSTEN:");
@@ -97,7 +98,7 @@ internal static class Program
         public string Name = "";
         public DateTime Start, End;
         public long In, Out, Reward, Spent, Sales, Trade;
-        public int Missions, Zones, PartyEv, Deaths, Hangars, Losses, Incaps, Offers, Impounds, Friends, Defekt;
+        public int Missions, Zones, PartyEv, Deaths, Hangars, Losses, Incaps, Offers, Impounds, Friends, Defekt, MissionsDone;
         public string? LastLoc;
         public readonly System.Collections.Generic.SortedSet<string> Ships = new();
         public readonly System.Collections.Generic.SortedSet<string> Loadout = new();
@@ -148,6 +149,7 @@ internal static class Program
                 case EventKind.Impound: s.Impounds++; break;
                 case EventKind.Friend: s.Friends++; break;
                 case EventKind.Gear: s.Defekt++; break;
+                case EventKind.MissionDone: s.MissionsDone++; break;
             }
             if (e.Ship != null) s.Ships.Add(e.Ship);
         }

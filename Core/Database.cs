@@ -16,7 +16,7 @@ namespace SCLogReader.Core;
 public static class Database
 {
     const int SchemaVersion = 1;
-    const int ParserVersion = 2;   // erhöhen, wenn der Parser neue Felder/Events liefert
+    const int ParserVersion = 3;   // erhöhen, wenn der Parser neue Felder/Events liefert
 
     static string DbPath => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SCLogReader", "sessions.db");
@@ -139,6 +139,7 @@ public static class Database
         public long In, Reward, Out, Purchases, Sales, Trade;
         public DateTime? Start, End;
         public int Sessions;
+        public int MissionsDone;
         public List<string> Ships = new();
     }
 
@@ -170,6 +171,7 @@ public static class Database
         }
 
         a.Sessions = Convert.ToInt32(Scalar(db, "SELECT COUNT(*) FROM sessions") ?? 0);
+        a.MissionsDone = Convert.ToInt32(Scalar(db, "SELECT COUNT(*) FROM events WHERE kind='MissionDone'") ?? 0);
         if (Scalar(db, "SELECT MIN(time) FROM events") is string mn && DateTime.TryParse(mn, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out var s)) a.Start = s;
         if (Scalar(db, "SELECT MAX(time) FROM events") is string mx && DateTime.TryParse(mx, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out var e)) a.End = e;
 

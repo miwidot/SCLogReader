@@ -30,6 +30,7 @@ public enum EventKind
     Blueprint,
     Gear,
     Kill,
+    MissionDone,
     Info
 }
 
@@ -82,6 +83,7 @@ public partial class LogEntry : ObservableObject
         EventKind.Blueprint => "Bauplan",
         EventKind.Gear => "Defekt",
         EventKind.Kill => "Kampf",
+        EventKind.MissionDone => "Auftrag ✓",
         _ => "Info"
     };
 
@@ -121,6 +123,7 @@ public partial class LogEntry : ObservableObject
         EventKind.Blueprint => "⬡",
         EventKind.Gear => "✖",
         EventKind.Kill => "⚔",
+        EventKind.MissionDone => "✔",
         _ => "·"
     };
 }

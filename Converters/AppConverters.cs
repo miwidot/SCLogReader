@@ -74,6 +74,7 @@ public class KindToBrushConverter : IValueConverter
             EventKind.Blueprint => "#C084FC",
             EventKind.Gear => "#FB7185",
             EventKind.Kill => "#EF4444",
+            EventKind.MissionDone => "#FBBF24",
             _ => "#8B949E"
         };
         return new SolidColorBrush(Color.Parse(hex));

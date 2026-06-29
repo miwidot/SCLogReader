@@ -46,6 +46,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private long totalPurchases; // Käufe
     [ObservableProperty] private long totalSales;     // Item-Verkäufe
     [ObservableProperty] private long totalTrade;     // Fracht/Waren-Verkäufe
+    [ObservableProperty] private int missionsDone;    // abgeschlossene Aufträge (Belohnung nicht im Log)
 
     [ObservableProperty] private bool running;
 
@@ -63,7 +64,7 @@ public partial class MainViewModel : ObservableObject
         ["Alle"] = null,
         ["Geld"] = new() { EventKind.TransferIn, EventKind.TransferOut, EventKind.MissionReward,
                            EventKind.Purchase, EventKind.Sale, EventKind.Trade, EventKind.Offer },
-        ["Aufträge"] = new() { EventKind.Mission },
+        ["Aufträge"] = new() { EventKind.Mission, EventKind.MissionDone },
         ["Baupläne"] = new() { EventKind.Blueprint },
         ["Schiffe"] = new() { EventKind.Vehicle, EventKind.Quantum, EventKind.ShipLoss },
         ["Orte"] = new() { EventKind.Location, EventKind.Jurisdiction, EventKind.Hangar },
@@ -253,6 +254,16 @@ public partial class MainViewModel : ObservableObject
     public long NetSign => NetAll;
     public string FlowText => $"▼ Ein {IncomeAll:N0}    ▲ Aus {SpendAll:N0}";
     public string TradeText => $"⇄ Handel {TotalSales + TotalTrade:N0}    ↧ Käufe {TotalPurchases:N0}";
+    public bool HasMissions => MissionsDone > 0;
+    public string MissionsText => MissionsDone > 0
+        ? $"✔ {MissionsDone} Aufträge abgeschlossen — die Belohnung steht NICHT im Log (vom Server direkt aufs Konto). Differenz zu deinem echten Kontostand kommt v.a. daher."
+        : "";
+
+    partial void OnMissionsDoneChanged(int value)
+    {
+        OnPropertyChanged(nameof(HasMissions));
+        OnPropertyChanged(nameof(MissionsText));
+    }
     public string ToggleText => Running ? "Stop" : "Start";
 
     // Echter Kontostand (Eingabe) -> formatiert
@@ -525,6 +536,7 @@ public partial class MainViewModel : ObservableObject
         // Basis-Summen = nur fertige Sessions (DB). Live kommt per Tailer oben drauf.
         TotalIn = agg.In; TotalReward = agg.Reward; TotalSales = agg.Sales;
         TotalTrade = agg.Trade; TotalOut = agg.Out; TotalPurchases = agg.Purchases;
+        MissionsDone = agg.MissionsDone;
 
         RebuildBars();
         SetTopTransactions(topDb.OrderByDescending(e => System.Math.Abs(e.Amount)).Take(8)
@@ -547,7 +559,7 @@ public partial class MainViewModel : ObservableObject
 
         foreach (var n in new[] { nameof(IncomeAll), nameof(SpendAll), nameof(NetAll), nameof(NetBalanceText),
                  nameof(NetSign), nameof(FlowText), nameof(TradeText), nameof(ExpectedText), nameof(ExpectedBalance),
-                 nameof(SessionSpanText), nameof(FleetText), nameof(ShipsSeenText) })
+                 nameof(SessionSpanText), nameof(FleetText), nameof(ShipsSeenText), nameof(MissionsText) })
             OnPropertyChanged(n);
 
         Status = $"alle Sessions (DB: {agg.Sessions}) – laufende live…";
@@ -591,6 +603,7 @@ public partial class MainViewModel : ObservableObject
         TopTransactions.Clear();
         RecentMoney.Clear();
         TotalIn = TotalReward = TotalOut = TotalPurchases = TotalSales = TotalTrade = 0;
+        MissionsDone = 0;
         CurrentLocation = CurrentShip = "—";
         LastInventory = "—";
         _sessionStart = _sessionEnd = null;
@@ -722,6 +735,10 @@ public partial class MainViewModel : ObservableObject
                     break;
                 case EventKind.Inventory:
                     LastInventory = e.Detail;
+                    break;
+                case EventKind.MissionDone:
+                    MissionsDone++;
+                    OnPropertyChanged(nameof(MissionsText));
                     break;
             }
 

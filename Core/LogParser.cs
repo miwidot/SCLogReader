@@ -75,6 +75,10 @@ public class LogParser
     static readonly Regex BlueprintLine =
         new(@"Added notification ""Bauplan erhalten: (?<name>[^""]*)", RegexOptions.Compiled);
 
+    // Abgeschlossene Mission (Server-Event, ohne Betrag) – eindeutig je mission_id.
+    static readonly Regex MissionDone =
+        new(@"<MissionEnded>.*mission_id (?<id>[0-9a-f-]+) - mission_state MISSION_STATE_COMPLETED", RegexOptions.Compiled);
+
     // Ausrüstung/Item defekt ("Dein X ist unbrauchbar").
     static readonly Regex GearBroke =
         new(@"Deaktivierung eingeleitet: Dein (?<item>[^""]+?) ist unbrauchbar", RegexOptions.Compiled);
@@ -116,6 +120,7 @@ public class LogParser
     readonly System.Collections.Generic.HashSet<string> _loadoutSeen = new();
     readonly System.Collections.Generic.HashSet<string> _channelSeen = new();
     readonly System.Collections.Generic.HashSet<string> _gearSeen = new();
+    readonly System.Collections.Generic.HashSet<string> _missionsDone = new();
 
     /// <summary>Session-Metadaten (Build, Hardware, Charakter, Shard, …).</summary>
     public System.Collections.Generic.Dictionary<string, string> Meta { get; } = new();
@@ -345,6 +350,15 @@ public class LogParser
             var item = gb.Groups["item"].Value.Trim();
             if (item.Length > 0 && _gearSeen.Add(item))
                 return new LogEntry { Time = ParseTs(line), Kind = EventKind.Gear, Detail = $"{item} unbrauchbar" };
+            return null;
+        }
+
+        // Abgeschlossene Mission (Server-Event, ohne Betrag) – je mission_id nur einmal
+        var md = MissionDone.Match(line);
+        if (md.Success)
+        {
+            if (_missionsDone.Add(md.Groups["id"].Value))
+                return new LogEntry { Time = ParseTs(line), Kind = EventKind.MissionDone, Detail = "Auftrag abgeschlossen (Belohnung serverseitig)" };
             return null;
         }
 

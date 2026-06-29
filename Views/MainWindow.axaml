@@ -219,6 +219,12 @@
       <ScrollViewer Margin="0,10,0,0" VerticalScrollBarVisibility="Auto">
         <StackPanel Spacing="14">
 
+          <!-- Hinweis: nicht geloggte Auftragsbelohnungen -->
+          <Border Background="#1F3A2A14" BorderBrush="#FBBF24" BorderThickness="1"
+                  CornerRadius="8" Padding="12,9" IsVisible="{Binding HasMissions}">
+            <TextBlock Text="{Binding MissionsText}" Foreground="#FBBF24" FontSize="12" TextWrapping="Wrap" />
+          </Border>
+
           <!-- Übersicht -->
           <Grid ColumnDefinitions="*,*,*">
             <Border Grid.Column="0" Classes="card" Margin="0,0,6,0">
