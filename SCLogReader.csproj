@@ -8,7 +8,7 @@
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>1.1.6</Version>
+    <Version>1.1.7</Version>
     <Authors>miwidot</Authors>
     <RepositoryUrl>https://github.com/miwidot/SCLogReader</RepositoryUrl>
     <ApplicationIcon>SCLogReader.ico</ApplicationIcon>
