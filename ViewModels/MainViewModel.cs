@@ -151,6 +151,7 @@ public partial class MainViewModel : ObservableObject
     public ObservableCollection<StatItem> IncomeStats { get; } = new();
     public ObservableCollection<StatItem> SpendStats { get; } = new();
     public ObservableCollection<StatItem> TopTransactions { get; } = new();
+    public ObservableCollection<StatItem> RecentMoney { get; } = new();
     public string IncomeTotalText => $"{IncomeAll:N0} aUEC";
     public string SpendTotalText => $"{SpendAll:N0} aUEC";
 
@@ -170,15 +171,32 @@ public partial class MainViewModel : ObservableObject
 
     void SetTopTransactions(System.Collections.Generic.IEnumerable<LogEntry> events)
     {
+        var list = events.ToList();
         long max = 1;
-        foreach (var e in events) max = System.Math.Max(max, System.Math.Abs(e.Amount));
+        foreach (var e in list) max = System.Math.Max(max, System.Math.Abs(e.Amount));
         TopTransactions.Clear();
-        foreach (var e in events)
+        foreach (var e in list)
             TopTransactions.Add(new StatItem
             {
                 Label = $"{e.KindText}: {e.Detail}",
                 Value = e.Amount,
+                Time = e.Time,
                 BarWidth = System.Math.Abs(e.Amount) / (double)max * BarMax,
+                Color = Brush(e.Amount >= 0 ? "#4ADE80" : "#F87171")
+            });
+        RebuildRecentMoney();
+    }
+
+    // Letzte Geld-Bewegungen, neueste zuerst (mit Datum).
+    void RebuildRecentMoney()
+    {
+        RecentMoney.Clear();
+        foreach (var e in Events.Where(x => IsMoney(x.Kind)).OrderByDescending(x => x.Time).Take(30))
+            RecentMoney.Add(new StatItem
+            {
+                Label = $"{e.KindText}: {e.Detail}",
+                Value = e.Amount,
+                Time = e.Time,
                 Color = Brush(e.Amount >= 0 ? "#4ADE80" : "#F87171")
             });
     }
@@ -571,6 +589,7 @@ public partial class MainViewModel : ObservableObject
         IncomeStats.Clear();
         SpendStats.Clear();
         TopTransactions.Clear();
+        RecentMoney.Clear();
         TotalIn = TotalReward = TotalOut = TotalPurchases = TotalSales = TotalTrade = 0;
         CurrentLocation = CurrentShip = "—";
         LastInventory = "—";

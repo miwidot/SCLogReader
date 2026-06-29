@@ -291,10 +291,34 @@
               <ItemsControl ItemsSource="{Binding TopTransactions}">
                 <ItemsControl.ItemTemplate>
                   <DataTemplate x:DataType="m:StatItem">
-                    <Grid ColumnDefinitions="*,Auto" Margin="0,3">
-                      <TextBlock Grid.Column="0" Text="{Binding Label}" Foreground="#C9D1D9"
+                    <Grid ColumnDefinitions="100,*,Auto" Margin="0,3">
+                      <TextBlock Grid.Column="0" Text="{Binding WhenText}" Foreground="#8B949E"
+                                 FontFamily="Cascadia Code, Consolas, monospace" FontSize="11" VerticalAlignment="Center" />
+                      <TextBlock Grid.Column="1" Text="{Binding Label}" Foreground="#C9D1D9"
                                  TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,0,12,0" />
-                      <TextBlock Grid.Column="1" Text="{Binding ValueText}"
+                      <TextBlock Grid.Column="2" Text="{Binding ValueText}"
+                                 Foreground="{Binding Color}" FontWeight="SemiBold"
+                                 FontFamily="Cascadia Code, Consolas, monospace" FontSize="12" VerticalAlignment="Center" />
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+
+          <!-- Letzte Geld-Bewegungen (neueste zuerst) -->
+          <Border Classes="card">
+            <StackPanel>
+              <TextBlock Classes="label" Text="LETZTE GELD-BEWEGUNGEN" Margin="0,0,0,8" />
+              <ItemsControl ItemsSource="{Binding RecentMoney}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="m:StatItem">
+                    <Grid ColumnDefinitions="100,*,Auto" Margin="0,3">
+                      <TextBlock Grid.Column="0" Text="{Binding WhenText}" Foreground="#8B949E"
+                                 FontFamily="Cascadia Code, Consolas, monospace" FontSize="11" VerticalAlignment="Center" />
+                      <TextBlock Grid.Column="1" Text="{Binding Label}" Foreground="#C9D1D9"
+                                 TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,0,12,0" />
+                      <TextBlock Grid.Column="2" Text="{Binding ValueText}"
                                  Foreground="{Binding Color}" FontWeight="SemiBold"
                                  FontFamily="Cascadia Code, Consolas, monospace" FontSize="12" VerticalAlignment="Center" />
                     </Grid>
