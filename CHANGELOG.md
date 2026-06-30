@@ -5,6 +5,8 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 [SemVer](https://semver.org/lang/de/).
 
 ## [Unreleased]
+### Hinzugefügt
+- **Versions-Badge in der Kopfzeile ist klickbar** → öffnet Changelog/Releases.
 
 ## [1.1.10] - 2026-07-01
 ### Hinzugefügt

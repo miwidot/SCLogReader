@@ -105,6 +105,9 @@ public partial class MainViewModel : ObservableObject
         OpenUrl("https://www.google.com/search?q=" + System.Uri.EscapeDataString(q));
     }
 
+    [RelayCommand]
+    private void OpenChangelog() => OpenUrl("https://github.com/miwidot/SCLogReader/releases");
+
     static void OpenUrl(string url)
     {
         try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true }); }

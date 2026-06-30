@@ -29,9 +29,12 @@
         <StackPanel VerticalAlignment="Center">
           <StackPanel Orientation="Horizontal" Spacing="8">
             <TextBlock Text="SC Log Reader" Foreground="#F0F6FC" FontSize="18" FontWeight="Bold" />
-            <Border Background="#21262D" CornerRadius="6" Padding="6,1" VerticalAlignment="Center">
+            <Button Background="#21262D" CornerRadius="6" Padding="7,2" BorderThickness="0"
+                    VerticalAlignment="Center" Cursor="Hand"
+                    Command="{Binding OpenChangelogCommand}"
+                    ToolTip.Tip="Changelog / Releases öffnen">
               <TextBlock Text="{Binding VersionText}" Foreground="#8B949E" FontSize="11" FontWeight="SemiBold" />
-            </Border>
+            </Button>
           </StackPanel>
           <TextBlock Text="{Binding MetaSummary}" Foreground="#8B949E" FontSize="11" />
         </StackPanel>
