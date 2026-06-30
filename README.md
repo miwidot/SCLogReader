@@ -57,9 +57,11 @@ die ich **nie sehe** — und genau die kann das Tool dann (noch) nicht.
 
 ## 🤝 Mithelfen (ganz einfach!)
 
-Das Tool schreibt beim Start eine **`SCLogReader.debug.log`** neben die `.exe`.
-Darin steht u.a. eine Liste **„unbekannte Notification-Typen"** — also alles, was in
-deinem Log auftaucht, aber noch nicht ausgewertet wird.
+Das Tool wertet die aktuelle **`Game.log`** **und** die älteren Sessions aus dem
+**`logbackups\`**-Ordner aus (die werden zusätzlich archiviert). Beim Auswerten
+schreibt es eine **`SCLogReader.debug.log`** neben die `.exe` mit einer Liste
+**„unbekannte Event-Typen"** — also alles, was in **deinen** Logs (aktuelle + Backups)
+auftaucht, aber noch nicht ausgewertet wird.
 
 **→ Schick mir diese `SCLogReader.debug.log`** (oder die „unbekannte Events"-Zeilen)
 per [Issue](https://github.com/miwidot/SCLogReader/issues) — dann baue ich Support dafür ein.
