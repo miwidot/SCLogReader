@@ -43,6 +43,9 @@ $exe = Join-Path $root 'publish\SCLogReader.exe'
 if (-not (Test-Path $exe)) { throw "exe nicht gefunden: $exe" }
 Write-Host ("   gebaut: {0:N1} MB" -f ((Get-Item $exe).Length/1MB)) -ForegroundColor Green
 
+# Code-Signing (Certum/SimplySign) — bricht ab, wenn nicht signierbar (kein unsigniertes Release)
+& (Join-Path $root 'sign.ps1') -File $exe
+
 # Tag + Release
 git tag $tag 2>$null
 git push origin $tag

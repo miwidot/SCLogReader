@@ -7,6 +7,7 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 ## [Unreleased]
 ### Hinzugefügt
 - **Versions-Badge in der Kopfzeile ist klickbar** → öffnet Changelog/Releases.
+- Releases sind jetzt **digital signiert** (Certum Open Source Code Signing) → weniger SmartScreen-Warnung, sichtbarer Herausgeber.
 ### Geändert
 - Redundante **Baupläne-Leiste** entfernt — der Baupläne-Filter in der Tabelle zeigt jetzt (seit „alle Events laden") alle Baupläne mit Datum.
 
