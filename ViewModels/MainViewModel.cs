@@ -559,10 +559,10 @@ public partial class MainViewModel : ObservableObject
                 Database.Init();
                 int added = Database.IndexNew(archived);
 
-                // 4) Summen/Top/Tabelle per SQL (kein Vollladen)
+                // 4) Summen/Top per SQL + ALLE Events für die Tabelle (virtualisiert)
                 var agg = Database.Aggregate();
                 var topDb = Database.TopMoney(40);
-                var recent = Database.RecentEvents(3000);
+                var recent = Database.LoadAllEvents().ToList();
 
                 Logger.Log($"Alle Sessions: {agg.Sessions} in DB ({added} neu indexiert).");
                 FlushUnknownNotifications();

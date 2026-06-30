@@ -5,3 +5,5 @@ publish/
 *.suo
 .vs/
 scan_out.txt
+CLAUDE.md
+publish/

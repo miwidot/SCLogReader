@@ -74,6 +74,7 @@ So wächst das Tool über das hinaus, was ich allein erlebe. 💪
 
 Neueste **[`SCLogReader.exe` → Releases](https://github.com/miwidot/SCLogReader/releases/latest)**
 — eine Datei, doppelklicken, fertig. Prüft beim Start automatisch auf Updates.
+Was sich geändert hat: **[CHANGELOG](CHANGELOG.md)**.
 
 ---
 
