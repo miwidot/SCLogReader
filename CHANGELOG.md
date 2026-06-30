@@ -5,6 +5,8 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 [SemVer](https://semver.org/lang/de/).
 
 ## [Unreleased]
+
+## [1.1.11] - 2026-07-01
 ### Hinzugefügt
 - **Versions-Badge in der Kopfzeile ist klickbar** → öffnet Changelog/Releases.
 - Releases sind jetzt **digital signiert** (Certum Open Source Code Signing) → weniger SmartScreen-Warnung, sichtbarer Herausgeber.
@@ -65,4 +67,5 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 ## [1.0.0] - 2026-06-28
 ### Hinzugefügt
 - Erste öffentliche Version: Geld/Handel/Käufe, Aufträge mit Namen+Rang, Baupläne, Schiffe/Flotte, Crew, Tode, Ausrüstung, Quantum, Orte; Filter, Geld-Stats, Saldo, JSON/CSV-Export, Auto-Updater, Single-`.exe`.
+
 
