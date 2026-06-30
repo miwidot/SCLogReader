@@ -5,6 +5,8 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 [SemVer](https://semver.org/lang/de/).
 
 ## [Unreleased]
+
+## [1.1.10] - 2026-07-01
 ### Hinzugefügt
 - Event-Tabelle lädt jetzt **alle** Events (virtualisiert) → alle Filter über die komplette Historie vollständig, nicht mehr nur die letzten ~4000 Zeilen.
 - Vollständige, deduplizierte **Bauplan-Anzeige** (über alle Sessions, direkt aus der DB).
@@ -58,3 +60,4 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 ## [1.0.0] - 2026-06-28
 ### Hinzugefügt
 - Erste öffentliche Version: Geld/Handel/Käufe, Aufträge mit Namen+Rang, Baupläne, Schiffe/Flotte, Crew, Tode, Ausrüstung, Quantum, Orte; Filter, Geld-Stats, Saldo, JSON/CSV-Export, Auto-Updater, Single-`.exe`.
+
