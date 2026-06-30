@@ -7,6 +7,8 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 ## [Unreleased]
 ### Hinzugefügt
 - **Versions-Badge in der Kopfzeile ist klickbar** → öffnet Changelog/Releases.
+### Geändert
+- Redundante **Baupläne-Leiste** entfernt — der Baupläne-Filter in der Tabelle zeigt jetzt (seit „alle Events laden") alle Baupläne mit Datum.
 
 ## [1.1.10] - 2026-07-01
 ### Hinzugefügt
