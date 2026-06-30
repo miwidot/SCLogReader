@@ -153,6 +153,8 @@ public partial class MainViewModel : ObservableObject
     public ObservableCollection<StatItem> SpendStats { get; } = new();
     public ObservableCollection<StatItem> TopTransactions { get; } = new();
     public ObservableCollection<StatItem> RecentMoney { get; } = new();
+    public ObservableCollection<StatItem> CommodityTrades { get; } = new();
+    public bool HasTrades => CommodityTrades.Count > 0;
     public string IncomeTotalText => $"{IncomeAll:N0} aUEC";
     public string SpendTotalText => $"{SpendAll:N0} aUEC";
 
@@ -168,6 +170,7 @@ public partial class MainViewModel : ObservableObject
                         .OrderBy(e => System.Math.Abs(e.Amount))
                         .ToList();
         SetTopTransactions(top);
+        RebuildCommodityTrades(Events.Where(e => e.Kind == EventKind.Trade));
     }
 
     void SetTopTransactions(System.Collections.Generic.IEnumerable<LogEntry> events)
@@ -233,6 +236,42 @@ public partial class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(SpendTotalText));
     }
 
+    static readonly System.Text.RegularExpressions.Regex TradeDetail =
+        new(@"^(?<ware>.+?) ×(?<scu>\d+) SCU", System.Text.RegularExpressions.RegexOptions.Compiled);
+
+    // „Handel je Ware": SCU + Ø Preis/SCU + Erlös, pro Commodity zusammengefasst.
+    void RebuildCommodityTrades(System.Collections.Generic.IEnumerable<LogEntry> trades)
+    {
+        var agg = new System.Collections.Generic.Dictionary<string, (long scu, long erloes)>();
+        foreach (var e in trades)
+        {
+            var m = TradeDetail.Match(e.Detail ?? "");
+            if (!m.Success) continue;
+            var ware = m.Groups["ware"].Value.Trim();
+            long scu = long.TryParse(m.Groups["scu"].Value, out var s) ? s : 0;
+            var cur = agg.TryGetValue(ware, out var v) ? v : (scu: 0L, erloes: 0L);
+            agg[ware] = (cur.scu + scu, cur.erloes + e.Amount);
+        }
+
+        long maxErloes = 1;
+        foreach (var v in agg.Values) maxErloes = System.Math.Max(maxErloes, v.erloes);
+
+        CommodityTrades.Clear();
+        foreach (var kv in agg.OrderByDescending(k => k.Value.erloes))
+        {
+            var perScu = kv.Value.scu > 0 ? kv.Value.erloes / kv.Value.scu : 0;
+            CommodityTrades.Add(new StatItem
+            {
+                Label = kv.Key,
+                Sub = $"{kv.Value.scu:N0} SCU · Ø {perScu:N0}/SCU",
+                Value = kv.Value.erloes,
+                BarWidth = kv.Value.erloes / (double)maxErloes * BarMax,
+                Color = Brush("#22D3EE")
+            });
+        }
+        OnPropertyChanged(nameof(HasTrades));
+    }
+
     static IBrush Brush(string hex) => new SolidColorBrush(Color.Parse(hex));
 
     public string VersionText => "v" + Updater.CurrentVersion;
@@ -279,6 +318,7 @@ public partial class MainViewModel : ObservableObject
     long _running;
     bool _allMode;     // „Alle Sessions": DB-Basis + Live-Session oben drauf
     System.Collections.Generic.List<LogEntry> _dbTop = new();
+    System.Collections.Generic.List<LogEntry> _dbTrades = new();
     readonly System.Collections.Generic.List<LogEntry> _liveMoney = new();
 
     long StartBalance()
@@ -531,7 +571,9 @@ public partial class MainViewModel : ObservableObject
     {
         _allMode = true;
         _dbTop = topDb;
+        _dbTrades = Database.AllTrades();
         _liveMoney.Clear();
+        RebuildCommodityTrades(_dbTrades);
 
         // Basis-Summen = nur fertige Sessions (DB). Live kommt per Tailer oben drauf.
         TotalIn = agg.In; TotalReward = agg.Reward; TotalSales = agg.Sales;
@@ -602,6 +644,8 @@ public partial class MainViewModel : ObservableObject
         SpendStats.Clear();
         TopTransactions.Clear();
         RecentMoney.Clear();
+        CommodityTrades.Clear();
+        _dbTrades = new System.Collections.Generic.List<LogEntry>();
         TotalIn = TotalReward = TotalOut = TotalPurchases = TotalSales = TotalTrade = 0;
         MissionsDone = 0;
         CurrentLocation = CurrentShip = "—";
@@ -755,6 +799,8 @@ public partial class MainViewModel : ObservableObject
                     SetTopTransactions(_dbTop.Concat(_liveMoney)
                         .OrderByDescending(x => System.Math.Abs(x.Amount)).Take(8)
                         .OrderBy(x => System.Math.Abs(x.Amount)));
+                    if (e.Kind == EventKind.Trade)
+                        RebuildCommodityTrades(_dbTrades.Concat(_liveMoney.Where(x => x.Kind == EventKind.Trade)));
                 }
                 else RebuildStats();
             }

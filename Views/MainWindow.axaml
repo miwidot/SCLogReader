@@ -290,6 +290,30 @@
             </StackPanel>
           </Border>
 
+          <!-- Handel je Ware -->
+          <Border Classes="card" IsVisible="{Binding HasTrades}">
+            <StackPanel>
+              <TextBlock Classes="label" Text="HANDEL JE WARE (SCU · Ø Preis/SCU)" Margin="0,0,0,8" />
+              <ItemsControl ItemsSource="{Binding CommodityTrades}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="m:StatItem">
+                    <Grid ColumnDefinitions="150,*,Auto" Margin="0,4">
+                      <StackPanel Grid.Column="0">
+                        <TextBlock Text="{Binding Label}" Foreground="#F0F6FC" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding Sub}" Foreground="#8B949E" FontSize="11" />
+                      </StackPanel>
+                      <Border Grid.Column="1" Height="16" CornerRadius="4" HorizontalAlignment="Left"
+                              Width="{Binding BarWidth}" Background="{Binding Color}" VerticalAlignment="Center" />
+                      <TextBlock Grid.Column="2" Text="{Binding ValueText}" Foreground="#F0F6FC"
+                                 FontFamily="Cascadia Code, Consolas, monospace" FontSize="12"
+                                 Margin="10,0,0,0" VerticalAlignment="Center" />
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+
           <!-- Größte Einzel-Posten -->
           <Border Classes="card">
             <StackPanel>

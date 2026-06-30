@@ -7,6 +7,7 @@ namespace SCLogReader.Models;
 public class StatItem
 {
     public string Label { get; init; } = "";
+    public string Sub { get; init; } = "";
     public long Value { get; init; }
     public double BarWidth { get; init; }
     public IBrush Color { get; init; } = Brushes.Gray;

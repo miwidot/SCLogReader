@@ -127,6 +127,24 @@ public static class Database
         }
     }
 
+    /// <summary>Alle Fracht-Verkäufe (Kind=Trade) für die „Handel je Ware"-Übersicht.</summary>
+    public static List<LogEntry> AllTrades()
+    {
+        var list = new List<LogEntry>();
+        using var db = new SqliteConnection(Conn);
+        db.Open();
+        using var c = db.CreateCommand();
+        c.CommandText = "SELECT time,amount,detail FROM events WHERE kind='Trade'";
+        using var r = c.ExecuteReader();
+        while (r.Read())
+        {
+            DateTime.TryParse(r.GetString(0), CultureInfo.InvariantCulture,
+                DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out var t);
+            list.Add(new LogEntry { Time = t, Kind = EventKind.Trade, Amount = r.GetInt64(1), Detail = r.IsDBNull(2) ? "" : r.GetString(2) });
+        }
+        return list;
+    }
+
     public static int SessionCount()
     {
         using var db = new SqliteConnection(Conn);
