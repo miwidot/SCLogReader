@@ -145,6 +145,19 @@ public static class Database
         return list;
     }
 
+    /// <summary>Eindeutige erhaltene Baupläne über alle Sessions.</summary>
+    public static List<string> DistinctBlueprints()
+    {
+        var list = new List<string>();
+        using var db = new SqliteConnection(Conn);
+        db.Open();
+        using var c = db.CreateCommand();
+        c.CommandText = "SELECT DISTINCT detail FROM events WHERE kind='Blueprint' ORDER BY detail";
+        using var r = c.ExecuteReader();
+        while (r.Read()) if (!r.IsDBNull(0)) list.Add(r.GetString(0));
+        return list;
+    }
+
     public static int SessionCount()
     {
         using var db = new SqliteConnection(Conn);

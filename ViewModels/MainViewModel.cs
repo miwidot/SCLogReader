@@ -139,6 +139,19 @@ public partial class MainViewModel : ObservableObject
     static string Dur(TimeSpan t) =>
         t.TotalHours >= 1 ? $"{(int)t.TotalHours}h {t.Minutes}m" : $"{t.Minutes}m";
 
+    readonly System.Collections.Generic.SortedSet<string> _blueprints = new();
+    public bool HasBlueprints => _blueprints.Count > 0;
+    public string BlueprintsLine => _blueprints.Count == 0 ? "" : $"⬡  Baupläne ({_blueprints.Count}):  {string.Join("   ·   ", _blueprints)}";
+
+    void AddBlueprint(string name)
+    {
+        if (_blueprints.Add(name))
+        {
+            OnPropertyChanged(nameof(HasBlueprints));
+            OnPropertyChanged(nameof(BlueprintsLine));
+        }
+    }
+
     readonly System.Collections.Generic.HashSet<string> _shipSet = new();
     public ObservableCollection<string> ShipsSeen { get; } = new();
     public string FleetText => ShipsSeen.Count == 0 ? "" : $"{ShipsSeen.Count}× geflogen";
@@ -579,6 +592,9 @@ public partial class MainViewModel : ObservableObject
         TotalIn = agg.In; TotalReward = agg.Reward; TotalSales = agg.Sales;
         TotalTrade = agg.Trade; TotalOut = agg.Out; TotalPurchases = agg.Purchases;
         MissionsDone = agg.MissionsDone;
+        foreach (var bp in Database.DistinctBlueprints()) _blueprints.Add(bp);
+        OnPropertyChanged(nameof(HasBlueprints));
+        OnPropertyChanged(nameof(BlueprintsLine));
 
         RebuildBars();
         SetTopTransactions(topDb.OrderByDescending(e => System.Math.Abs(e.Amount)).Take(8)
@@ -640,6 +656,9 @@ public partial class MainViewModel : ObservableObject
         Events.Clear();
         ShipsSeen.Clear();
         _shipSet.Clear();
+        _blueprints.Clear();
+        OnPropertyChanged(nameof(HasBlueprints));
+        OnPropertyChanged(nameof(BlueprintsLine));
         IncomeStats.Clear();
         SpendStats.Clear();
         TopTransactions.Clear();
@@ -783,6 +802,9 @@ public partial class MainViewModel : ObservableObject
                 case EventKind.MissionDone:
                     MissionsDone++;
                     OnPropertyChanged(nameof(MissionsText));
+                    break;
+                case EventKind.Blueprint:
+                    AddBlueprint(e.Detail);
                     break;
             }
 
