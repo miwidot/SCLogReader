@@ -5,6 +5,8 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 [SemVer](https://semver.org/lang/de/).
 
 ## [Unreleased]
+### Hinzugefügt
+- **Bauplan-Nachschlagen** öffnet jetzt direkt die **CitizenHQ-Bauplan-DB** (citizenhq.space/blueprints) statt Google.
 
 ## [1.1.12] - 2026-07-03
 ### Hinzugefügt

@@ -93,9 +93,19 @@ public partial class MainViewModel : ObservableObject
         }
         term = term.Trim();
 
+        // Baupläne direkt in der CitizenHQ-Bauplan-DB nachschlagen (?q= treibt die Suche).
+        // Die Suche macht Substring-Match auf den vollen Namen – daher nur die ersten
+        // 2 Wörter senden, sonst liefern abweichende Farb-/Variantennamen 0 Treffer.
+        if (e.Kind == EventKind.Blueprint)
+        {
+            var words = term.Split(' ', System.StringSplitOptions.RemoveEmptyEntries);
+            var query = string.Join(" ", words.Length > 2 ? words[..2] : words);
+            OpenUrl("https://citizenhq.space/blueprints?q=" + System.Uri.EscapeDataString(query));
+            return;
+        }
+
         string q = e.Kind switch
         {
-            EventKind.Blueprint => $"Star Citizen {term} blueprint",
             EventKind.Vehicle or EventKind.ShipLoss or EventKind.Quantum => $"Star Citizen {term} ship",
             EventKind.Sale or EventKind.Purchase => $"Star Citizen {term} item",
             EventKind.Trade => $"Star Citizen {term} commodity",
