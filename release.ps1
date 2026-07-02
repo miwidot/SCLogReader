@@ -12,13 +12,20 @@ $tag  = "v$ver"
 $date = Get-Date -Format 'yyyy-MM-dd'
 Write-Host "==> Release $tag" -ForegroundColor Cyan
 
-# CHANGELOG: [Unreleased] -> [version] - date, frische leere [Unreleased] oben einsetzen
+# CHANGELOG: [Unreleased] -> [version] - date. Idempotent: bei Retry Notes aus der
+# bereits gestempelten [version]-Sektion nehmen (kein doppeltes Stempeln/Committen).
 $cl = Get-Content $clPath -Raw
-if ($cl -match '(?ms)^## \[Unreleased\]\s*(.*?)(?=^## \[|\z)') {
+$verPat = "(?ms)^## \[$([regex]::Escape($ver))\][^\r\n]*\r?\n(.*?)(?=^## \[|\z)"
+if ($cl -match $verPat) {
+  $body = $Matches[1].Trim()                         # schon gestempelt (Retry)
+} elseif ($cl -match '(?ms)^## \[Unreleased\]\s*(.*?)(?=^## \[|\z)') {
   $body = $Matches[1].Trim()
   if (-not $body) { $body = '- (keine Einträge)' }
   $cl = $cl -replace '(?m)^## \[Unreleased\]\s*', "## [Unreleased]`r`n`r`n## [$ver] - $date`r`n"
   Set-Content $clPath $cl -Encoding UTF8
+  git add CHANGELOG.md
+  git commit -m "changelog: $tag" 2>&1 | Out-Null
+  git push 2>&1 | Out-Null
 } else {
   $body = "Siehe Commits."
 }
@@ -27,11 +34,6 @@ if ($cl -match '(?ms)^## \[Unreleased\]\s*(.*?)(?=^## \[|\z)') {
 $notes = "$body`r`n`r`n---`r`n📋 Vollständiges Changelog: https://github.com/miwidot/SCLogReader/blob/main/CHANGELOG.md"
 $notesFile = Join-Path $env:TEMP "sclr_notes_$ver.md"
 Set-Content $notesFile $notes -Encoding UTF8
-
-# Changelog-Update committen
-git add CHANGELOG.md
-git commit -m "changelog: $tag" 2>&1 | Out-Null
-git push 2>&1 | Out-Null
 
 # Single-file exe bauen
 dotnet publish -c Release -r win-x64 --self-contained true `
