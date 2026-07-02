@@ -5,6 +5,8 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 [SemVer](https://semver.org/lang/de/).
 
 ## [Unreleased]
+
+## [1.1.12] - 2026-07-03
 ### Hinzugefügt
 - Grünes **„✓ Gespeichert"-Signal** direkt am Kontostand-Setzen-Button (Rückmeldung, dass gespeichert wurde).
 - **Bußgelder** (`Strafe gezahlt`) werden erfasst — echtes aUEC raus, fließt in Saldo & Geld-Stats.
@@ -73,5 +75,6 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 ## [1.0.0] - 2026-06-28
 ### Hinzugefügt
 - Erste öffentliche Version: Geld/Handel/Käufe, Aufträge mit Namen+Rang, Baupläne, Schiffe/Flotte, Crew, Tode, Ausrüstung, Quantum, Orte; Filter, Geld-Stats, Saldo, JSON/CSV-Export, Auto-Updater, Single-`.exe`.
+
 
 
