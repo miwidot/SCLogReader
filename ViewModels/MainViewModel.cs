@@ -64,14 +64,15 @@ public partial class MainViewModel : ObservableObject
     {
         ["Alle"] = null,
         ["Geld"] = new() { EventKind.TransferIn, EventKind.TransferOut, EventKind.MissionReward,
-                           EventKind.Purchase, EventKind.Sale, EventKind.Trade, EventKind.Offer },
+                           EventKind.Purchase, EventKind.Sale, EventKind.Trade, EventKind.Offer, EventKind.Fine },
         ["Aufträge"] = new() { EventKind.Mission, EventKind.MissionDone },
         ["Baupläne"] = new() { EventKind.Blueprint },
         ["Schiffe"] = new() { EventKind.Vehicle, EventKind.Quantum, EventKind.ShipLoss },
         ["Orte"] = new() { EventKind.Location, EventKind.Jurisdiction, EventKind.Hangar },
         ["Crew"] = new() { EventKind.Party, EventKind.Friend },
         ["Sonst"] = new() { EventKind.MedBed, EventKind.Death, EventKind.Impound,
-                            EventKind.Loadout, EventKind.Entitlement, EventKind.Inventory, EventKind.Gear, EventKind.Kill },
+                            EventKind.Loadout, EventKind.Entitlement, EventKind.Inventory, EventKind.Gear, EventKind.Kill,
+                            EventKind.Crime, EventKind.Refinery, EventKind.Injury },
     };
 
     [ObservableProperty] private LogEntry? selectedEntry;
@@ -350,7 +351,7 @@ public partial class MainViewModel : ObservableObject
     public string ExpectedText => StartBalance() > 0 ? $"≈ {ExpectedBalance:N0} aUEC" : "Start oben eintragen";
 
     static bool IsMoney(EventKind k) => k is EventKind.TransferIn or EventKind.TransferOut
-        or EventKind.MissionReward or EventKind.Purchase or EventKind.Sale or EventKind.Trade;
+        or EventKind.MissionReward or EventKind.Purchase or EventKind.Sale or EventKind.Trade or EventKind.Fine;
 
     // Saldo-Verlauf neu berechnen (z.B. wenn Startwert geändert wird)
     void RecomputeBalances()
@@ -784,6 +785,9 @@ public partial class MainViewModel : ObservableObject
                     break;
                 case EventKind.TransferOut:
                     TotalOut += -e.Amount;       // Amount ist negativ
+                    break;
+                case EventKind.Fine:
+                    TotalOut += -e.Amount;       // Bußgeld = aUEC raus
                     break;
                 case EventKind.Purchase:
                     TotalPurchases += -e.Amount;

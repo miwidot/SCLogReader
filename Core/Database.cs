@@ -16,7 +16,7 @@ namespace SCLogReader.Core;
 public static class Database
 {
     const int SchemaVersion = 1;
-    const int ParserVersion = 3;   // erhöhen, wenn der Parser neue Felder/Events liefert
+    const int ParserVersion = 4;   // erhöhen, wenn der Parser neue Felder/Events liefert
 
     static string DbPath => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SCLogReader", "sessions.db");
@@ -195,7 +195,8 @@ public static class Database
                     case "MissionReward": a.Reward = sum; break;
                     case "Sale": a.Sales = sum; break;
                     case "Trade": a.Trade = sum; break;
-                    case "TransferOut": a.Out = -sum; break;   // Beträge negativ -> positiv
+                    case "TransferOut": a.Out += -sum; break;  // Beträge negativ -> positiv
+                    case "Fine": a.Out += -sum; break;         // Bußgelder = aUEC raus
                     case "Purchase": a.Purchases = -sum; break;
                 }
             }
@@ -223,7 +224,7 @@ public static class Database
         db.Open();
         using var c = db.CreateCommand();
         c.CommandText = @"SELECT kind,amount,detail FROM events
-                          WHERE kind IN ('TransferIn','TransferOut','MissionReward','Purchase','Sale','Trade')
+                          WHERE kind IN ('TransferIn','TransferOut','MissionReward','Purchase','Sale','Trade','Fine')
                           ORDER BY ABS(amount) DESC LIMIT $n";
         c.Parameters.AddWithValue("$n", n);
         using var r = c.ExecuteReader();

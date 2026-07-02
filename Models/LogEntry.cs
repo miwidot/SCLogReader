@@ -31,6 +31,10 @@ public enum EventKind
     Gear,
     Kill,
     MissionDone,
+    Fine,
+    Crime,
+    Refinery,
+    Injury,
     Info
 }
 
@@ -84,6 +88,10 @@ public partial class LogEntry : ObservableObject
         EventKind.Gear => "Defekt",
         EventKind.Kill => "Kampf",
         EventKind.MissionDone => "Auftrag ✓",
+        EventKind.Fine => "Strafe",
+        EventKind.Crime => "Straftat",
+        EventKind.Refinery => "Veredelung",
+        EventKind.Injury => "Verletzung",
         _ => "Info"
     };
 
@@ -124,6 +132,10 @@ public partial class LogEntry : ObservableObject
         EventKind.Gear => "✖",
         EventKind.Kill => "⚔",
         EventKind.MissionDone => "✔",
+        EventKind.Fine => "⚖",
+        EventKind.Crime => "⚠",
+        EventKind.Refinery => "⚗",
+        EventKind.Injury => "⚕",
         _ => "·"
     };
 }

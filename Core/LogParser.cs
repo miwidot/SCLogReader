@@ -103,6 +103,22 @@ public class LogParser
     static readonly System.Collections.Generic.HashSet<string> OwnNames =
         new(StringComparer.OrdinalIgnoreCase) { "MiwiDot", "miwi", "miwitv" };
 
+    // Bußgeld gezahlt (mit Betrag) – echtes aUEC raus, fließt in den Saldo.
+    static readonly Regex FineLine =
+        new(@"Added notification ""Strafe gezahlt:\s*(?<amt>[\d.,]+)", RegexOptions.Compiled);
+
+    // Begangene Straftat (Crimestat-Verlauf).
+    static readonly Regex CrimeLine =
+        new(@"Added notification ""Begangene Straftat:\s*(?<crime>[^""]+)", RegexOptions.Compiled);
+
+    // Veredelungs-/Refinery-Auftrag abgeschlossen.
+    static readonly Regex RefineryLine =
+        new(@"Added notification ""Ein Auftrag zur Veredelung wurde abgeschlossen(?<txt>[^""]*)", RegexOptions.Compiled);
+
+    // Verletzung/Lähmung festgestellt (Schweregrad + Körperteil + Behandlungsstufe).
+    static readonly Regex InjuryLine =
+        new(@"Added notification ""(?<txt>(?:Leichte|Mäßige|Schwere|Kritische|Teilweise) (?:Verletzung|Lähmung)[^""]*)", RegexOptions.Compiled);
+
     // Party-Mitglieder rein/raus (Name in der Folgezeile der Notification).
     static readonly Regex PartyJoin =
         new(@"(?<who>[A-Za-z0-9_\-]+) ist Party beigetreten", RegexOptions.Compiled);
@@ -368,6 +384,39 @@ public class LogParser
         {
             var name = bp.Groups["name"].Value.TrimEnd(' ', ':');
             if (name != _lastNotif) { _lastNotif = name; return new LogEntry { Time = ParseTs(line), Kind = EventKind.Blueprint, Detail = name }; }
+            return null;
+        }
+
+        // Bußgeld gezahlt – echtes aUEC raus (fließt in den Saldo)
+        var fn = FineLine.Match(line);
+        if (fn.Success)
+        {
+            long amt = ParseAmt(fn.Groups["amt"].Value);
+            return new LogEntry { Time = ParseTs(line), Kind = EventKind.Fine, Amount = -amt, Detail = $"Strafe gezahlt: {amt:N0} aUEC" };
+        }
+
+        // Begangene Straftat (Crimestat)
+        var cr = CrimeLine.Match(line);
+        if (cr.Success)
+        {
+            var crime = cr.Groups["crime"].Value.TrimEnd(' ', ':');
+            return new LogEntry { Time = ParseTs(line), Kind = EventKind.Crime, Detail = crime };
+        }
+
+        // Veredelungs-Auftrag abgeschlossen (Refinery)
+        var rf = RefineryLine.Match(line);
+        if (rf.Success)
+        {
+            var where = rf.Groups["txt"].Value.Trim().TrimStart('.').Trim().TrimEnd('.');
+            return new LogEntry { Time = ParseTs(line), Kind = EventKind.Refinery, Detail = where.Length > 0 ? $"Veredelung fertig {where}" : "Veredelung fertig" };
+        }
+
+        // Verletzung/Lähmung festgestellt (Körperteil + Behandlungsstufe)
+        var ij = InjuryLine.Match(line);
+        if (ij.Success)
+        {
+            var txt = ij.Groups["txt"].Value.Replace(" Behandlung erforderlich", "").Replace(" festgestellt", "").Trim().TrimEnd(' ', ':', '-');
+            if (txt != _lastNotif) { _lastNotif = txt; return new LogEntry { Time = ParseTs(line), Kind = EventKind.Injury, Detail = txt }; }
             return null;
         }
 

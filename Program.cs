@@ -125,12 +125,13 @@ internal static class Program
             var e = parser.Feed(line);
             if (e == null) continue;
             if (e.Kind is EventKind.TransferIn or EventKind.TransferOut or EventKind.MissionReward
-                       or EventKind.Purchase or EventKind.Sale or EventKind.Trade)
+                       or EventKind.Purchase or EventKind.Sale or EventKind.Trade or EventKind.Fine)
                 s.Money.Add((e.Amount, $"{e.KindText}: {e.Detail}"));
             switch (e.Kind)
             {
                 case EventKind.TransferIn: s.In += e.Amount; break;
                 case EventKind.TransferOut: s.Out += -e.Amount; break;
+                case EventKind.Fine: s.Out += -e.Amount; break;
                 case EventKind.MissionReward: s.In += e.Amount; s.Reward += e.Amount; break;
                 case EventKind.Location: s.LastLoc = e.Detail; break;
                 case EventKind.Purchase: s.Spent += -e.Amount; break;

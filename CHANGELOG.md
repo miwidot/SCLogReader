@@ -7,6 +7,10 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 ## [Unreleased]
 ### Hinzugefügt
 - Grünes **„✓ Gespeichert"-Signal** direkt am Kontostand-Setzen-Button (Rückmeldung, dass gespeichert wurde).
+- **Bußgelder** (`Strafe gezahlt`) werden erfasst — echtes aUEC raus, fließt in Saldo & Geld-Stats.
+- **Straftaten** (`Begangene Straftat`, Crimestat-Verlauf) als Event im „Sonst"-Filter.
+- **Veredelungs-Aufträge** (Refinery abgeschlossen) als Event.
+- **Verletzungen** (Schweregrad · Körperteil · Behandlungsstufe) als Med-Event.
 
 ## [1.1.11] - 2026-07-01
 ### Hinzugefügt
