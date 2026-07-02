@@ -5,6 +5,8 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 [SemVer](https://semver.org/lang/de/).
 
 ## [Unreleased]
+### Hinzugefügt
+- Grünes **„✓ Gespeichert"-Signal** direkt am Kontostand-Setzen-Button (Rückmeldung, dass gespeichert wurde).
 
 ## [1.1.11] - 2026-07-01
 ### Hinzugefügt

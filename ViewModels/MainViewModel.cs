@@ -31,6 +31,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private string logPath = "";
     [ObservableProperty] private string status = "bereit";
     [ObservableProperty] private string manualBalance = "";   // echter Kontostand (Eingabe)
+    [ObservableProperty] private bool balanceSaved;            // kurzes „✓ Gespeichert"-Signal
     [ObservableProperty] private bool updateAvailable;
     [ObservableProperty] private string updateText = "";
     Updater.Info? _update;
@@ -124,6 +125,8 @@ public partial class MainViewModel : ObservableObject
         RecomputeBalances();
         OnPropertyChanged(nameof(AccountText));
         Status = v > 0 ? $"Kontostand gesetzt: {v:N0} aUEC" : "Kontostand geleert";
+        BalanceSaved = true;   // grünes OK-Signal am Button, blendet nach 2s aus
+        Avalonia.Threading.DispatcherTimer.RunOnce(() => BalanceSaved = false, System.TimeSpan.FromSeconds(2));
     }
 
     [RelayCommand]

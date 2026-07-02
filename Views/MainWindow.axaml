@@ -94,6 +94,8 @@
             <Button Classes="accent" Padding="10,5" VerticalAlignment="Stretch"
                     Command="{Binding SetBalanceCommand}" Content="✓ Setzen"
                     ToolTip.Tip="Speichern und Saldo neu berechnen" />
+            <TextBlock Text="✓ Gespeichert" Foreground="#3FB950" FontWeight="Bold" FontSize="12"
+                       VerticalAlignment="Center" IsVisible="{Binding BalanceSaved}" />
           </StackPanel>
           <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,6,0,0">
             <TextBlock Text="Erwartet:" Foreground="#8B949E" FontSize="13" VerticalAlignment="Center" />
