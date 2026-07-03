@@ -93,6 +93,28 @@ public partial class MainViewModel : ObservableObject
         }
         term = term.Trim();
 
+        // Missionen in der CitizenHQ-Missions-DB nachschlagen. Nur den Status-Präfix
+        // ("Auftrag abgeschlossen: " …) strippen – der Name selbst kann "-" und ":" enthalten,
+        // daher NICHT die generische Trennung von oben verwenden.
+        if (e.Kind == EventKind.Mission)
+        {
+            var name = System.Text.RegularExpressions.Regex.Replace(
+                e.Detail ?? "",
+                @"^(Auftrag (?:abgeschlossen|angenommen|geteilt|zurückgezogen)|Neuer Auftrag|New Objective|Contract (?:Accepted|Complete)):?\s*",
+                "").Trim();
+            foreach (var sep in new[] { " | ", " Rang:", " Direktroute:", "  ·" })   // Rang/Route-Ballast abschneiden
+            {
+                var i = name.IndexOf(sep, System.StringComparison.Ordinal);
+                if (i > 2) name = name[..i];
+            }
+            name = name.Trim(' ', ':');
+            if (name.Length > 1)
+            {
+                OpenUrl("https://citizenhq.space/missions?q=" + System.Uri.EscapeDataString(name));
+                return;
+            }
+        }
+
         // Baupläne direkt in der CitizenHQ-Bauplan-DB nachschlagen (?q= treibt die Suche).
         // Die Suche macht Substring-Match auf den vollen Namen – daher nur die ersten
         // 2 Wörter senden, sonst liefern abweichende Farb-/Variantennamen 0 Treffer.
