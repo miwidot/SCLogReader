@@ -8,6 +8,7 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 ### Hinzugefügt
 - **Bauplan-Nachschlagen** öffnet jetzt direkt die **CitizenHQ-Bauplan-DB** (citizenhq.space/blueprints) statt Google.
 - **Missions-Nachschlagen** öffnet die **CitizenHQ-Missions-DB** (citizenhq.space/missions) — zeigt dort Reward, Fraktion, Bauplan-Quelle u.a.
+- **DE→EN-Übersetzung** fürs Nachschlagen: deutsche Missions-/Bauplan-Titel werden über die lokale `global.ini` ins Englische übersetzt, bevor die (englische) CitizenHQ-DB aufgerufen wird.
 
 ## [1.1.12] - 2026-07-03
 ### Hinzugefügt

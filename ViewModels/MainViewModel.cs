@@ -107,7 +107,7 @@ public partial class MainViewModel : ObservableObject
                 var i = name.IndexOf(sep, System.StringComparison.Ordinal);
                 if (i > 2) name = name[..i];
             }
-            name = name.Trim(' ', ':');
+            name = Localization.ToEnglish(name.Trim(' ', ':'), LogPath);   // DE→EN für die englische DB
             if (name.Length > 1)
             {
                 OpenUrl("https://citizenhq.space/missions?q=" + System.Uri.EscapeDataString(name));
@@ -120,7 +120,8 @@ public partial class MainViewModel : ObservableObject
         // 2 Wörter senden, sonst liefern abweichende Farb-/Variantennamen 0 Treffer.
         if (e.Kind == EventKind.Blueprint)
         {
-            var words = term.Split(' ', System.StringSplitOptions.RemoveEmptyEntries);
+            var en = Localization.ToEnglish(term, LogPath);   // DE→EN, dann erst kürzen
+            var words = en.Split(' ', System.StringSplitOptions.RemoveEmptyEntries);
             var query = string.Join(" ", words.Length > 2 ? words[..2] : words);
             OpenUrl("https://citizenhq.space/blueprints?q=" + System.Uri.EscapeDataString(query));
             return;
