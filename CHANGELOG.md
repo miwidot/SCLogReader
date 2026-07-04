@@ -5,6 +5,8 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 [SemVer](https://semver.org/lang/de/).
 
 ## [Unreleased]
+### Behoben
+- **Mehrfachkäufe/-verkäufe wurden × Stückzahl zu teuer gerechnet.** `client_price` im Log ist bereits der **Gesamtpreis** — wir haben ihn fälschlich nochmal mit der Menge multipliziert (4 Attrition-5 → 4,4 Mio statt 1,05 Mio). Betraf jeden Kauf/Verkauf mit Menge > 1. Danke an **Saturin** für den Report! (DB wird beim Start einmalig neu aufgebaut → korrigiert rückwirkend.)
 ### Hinzugefügt
 - **Bauplan-Nachschlagen** öffnet jetzt direkt die **CitizenHQ-Bauplan-DB** (citizenhq.space/blueprints) statt Google.
 - **Missions-Nachschlagen** öffnet die **CitizenHQ-Missions-DB** (citizenhq.space/missions) — zeigt dort Reward, Fraktion, Bauplan-Quelle u.a.

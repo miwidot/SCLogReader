@@ -182,7 +182,7 @@ public class LogParser
         var by = Buy.Match(line);
         if (by.Success)
         {
-            long price = (long)ParseDouble(by.Groups["price"].Value);
+            long price = (long)ParseDouble(by.Groups["price"].Value);   // client_price = GESAMTpreis (alle Stück)
             int qty = int.TryParse(by.Groups["qty"].Value, out var q) ? q : 1;
             var shop = CleanShop(by.Groups["shop"].Value);
             var item = ItemNames.CleanFallback(by.Groups["item"].Value);
@@ -191,7 +191,7 @@ public class LogParser
             {
                 Time = ParseTs(line),
                 Kind = EventKind.Purchase,
-                Amount = -(price * qty),
+                Amount = -price,                                        // NICHT ×qty – Preis ist schon der Gesamtbetrag
                 ItemRef = by.Groups["guid"].Value,
                 Suffix = suffix,
                 Detail = $"{item}  {suffix}"
@@ -201,7 +201,7 @@ public class LogParser
         var se = Sell.Match(line);
         if (se.Success)
         {
-            long price = (long)ParseDouble(se.Groups["price"].Value);
+            long price = (long)ParseDouble(se.Groups["price"].Value);   // client_price = GESAMTpreis (alle Stück)
             int qty = int.TryParse(se.Groups["qty"].Value, out var q) ? q : 1;
             var shop = CleanShop(se.Groups["shop"].Value);
             var item = ItemNames.CleanFallback(se.Groups["item"].Value);
@@ -210,7 +210,7 @@ public class LogParser
             {
                 Time = ParseTs(line),
                 Kind = EventKind.Sale,
-                Amount = price * qty,
+                Amount = price,                                        // NICHT ×qty – Preis ist schon der Gesamtbetrag
                 ItemRef = se.Groups["guid"].Value,
                 Suffix = suffix,
                 Detail = $"{item}  {suffix}"
