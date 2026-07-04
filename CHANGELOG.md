@@ -5,6 +5,8 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 [SemVer](https://semver.org/lang/de/).
 
 ## [Unreleased]
+
+## [1.1.13] - 2026-07-05
 ### Behoben
 - **Mehrfachkäufe/-verkäufe wurden × Stückzahl zu teuer gerechnet.** `client_price` im Log ist bereits der **Gesamtpreis** — wir haben ihn fälschlich nochmal mit der Menge multipliziert (4 Attrition-5 → 4,4 Mio statt 1,05 Mio). Betraf jeden Kauf/Verkauf mit Menge > 1. Danke an **Saturin** für den Report! (DB wird beim Start einmalig neu aufgebaut → korrigiert rückwirkend.)
 ### Hinzugefügt
@@ -81,6 +83,7 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 ## [1.0.0] - 2026-06-28
 ### Hinzugefügt
 - Erste öffentliche Version: Geld/Handel/Käufe, Aufträge mit Namen+Rang, Baupläne, Schiffe/Flotte, Crew, Tode, Ausrüstung, Quantum, Orte; Filter, Geld-Stats, Saldo, JSON/CSV-Export, Auto-Updater, Single-`.exe`.
+
 
 
 
