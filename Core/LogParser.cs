@@ -103,6 +103,11 @@ public class LogParser
     static readonly System.Collections.Generic.HashSet<string> OwnNames =
         new(StringComparer.OrdinalIgnoreCase) { "MiwiDot", "miwi", "miwitv" };
 
+    // Loot: Item ins Inventar gestaut. Nur „Runtime-spawned" = von der Welt gespawnt
+    // (echter Loot aus Kisten/Gegnern), nicht Kauf/Umräumen.
+    static readonly Regex LootStore =
+        new(@"<OnInventoryStoreItem> Entity\[[^ ]+ - Class\((?<cls>[^)]+)\) - Context\((?<ctx>[^)]*)\)", RegexOptions.Compiled);
+
     // Bußgeld gezahlt (mit Betrag) – echtes aUEC raus, fließt in den Saldo.
     static readonly Regex FineLine =
         new(@"Added notification ""Strafe gezahlt:\s*(?<amt>[\d.,]+)", RegexOptions.Compiled);
@@ -129,6 +134,7 @@ public class LogParser
     int _pendDir;          // +1 = rein, -1 = raus
     DateTime _pendTime;
 
+    string? _lastLoot;                      // gegen Loot-Doppelzeilen
     string? _lastLoc;                       // für Quantum-Kontext
     DateTime _lastQt = DateTime.MinValue;   // Drosselung der QT-Marker
     string? _lastNotif;                     // gegen Notification-Spam
@@ -253,6 +259,16 @@ public class LogParser
         {
             var ship = Ships.Prettify(ve.Groups["ship"].Value);
             return new LogEntry { Time = ParseTs(line), Kind = EventKind.Vehicle, Detail = ship, Ship = ship };
+        }
+
+        // Loot: nur von der Welt gespawnte Items (Kisten/Gegner), kein Kauf/Umräumen
+        var lt = LootStore.Match(line);
+        if (lt.Success)
+        {
+            if (!lt.Groups["ctx"].Value.Contains("Runtime-spawned")) return null;
+            var name = CleanLootName(lt.Groups["cls"].Value);
+            if (name.Length >= 3 && name != _lastLoot) { _lastLoot = name; return new LogEntry { Time = ParseTs(line), Kind = EventKind.Loot, Detail = name }; }
+            return null;
         }
 
         // Quantum-Reise: nur ABGESCHLOSSENE Sprünge (Ankunft). Das Log nennt
@@ -483,6 +499,14 @@ public class LogParser
         s = Regex.Replace(s, @"~mission\([^)]*\)", "");
         s = s.Replace("[BP]", "").Trim(' ', ':', '|', '*', '?', '-');
         return Regex.Replace(s, @"\s{2,}", " ").Trim();
+    }
+
+    static string CleanLootName(string cls)
+    {
+        // Versions-/Varianten-Segmente raus (_04_04_01, _a, _01) und Unterstriche zu Leerzeichen
+        var s = Regex.Replace(cls, @"_(\d+|[a-z])(?=_|$)", "");
+        s = s.Replace('_', ' ').Trim();
+        return Regex.Replace(s, @"\s{2,}", " ");
     }
 
     static string? CleanLoadout(string raw)

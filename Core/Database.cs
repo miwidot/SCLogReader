@@ -16,7 +16,7 @@ namespace SCLogReader.Core;
 public static class Database
 {
     const int SchemaVersion = 1;
-    const int ParserVersion = 5;   // erhöhen, wenn der Parser neue Felder/Events liefert
+    const int ParserVersion = 6;   // erhöhen, wenn der Parser neue Felder/Events liefert
 
     static string DbPath => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SCLogReader", "sessions.db");

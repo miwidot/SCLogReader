@@ -5,6 +5,8 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 [SemVer](https://semver.org/lang/de/).
 
 ## [Unreleased]
+### Hinzugefügt
+- **Loot-Erfassung** (`◈ Loot`-Filter): von der Welt gespawnte Items, die du aufsammelst (Kisten/Gegner) — nur echter Loot (`Runtime-spawned`), nicht Kauf/Umräumen. Namen bereinigt, dedupliziert.
 
 ## [1.1.13] - 2026-07-05
 ### Behoben

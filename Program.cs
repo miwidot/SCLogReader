@@ -71,6 +71,7 @@ internal static class Program
             Console.WriteLine($"   Verluste {s.Losses} · Kampfunfähig {s.Incaps} · Angebote {s.Offers} · Beschlagn. {s.Impounds} · Freunde {s.Friends} · Defekt {s.Defekt}");
             foreach (var mt in s.MissionTexts.Take(6)) Console.WriteLine($"   ◦ {mt}");
             if (s.Blueprints.Count > 0) Console.WriteLine($"   Baupläne: {string.Join(", ", s.Blueprints)}");
+            if (s.Loot.Count > 0) Console.WriteLine($"   Loot ({s.Loot.Count}): {string.Join(", ", s.Loot)}");
         }
 
         var meta = all.OrderByDescending(s => s.Start).FirstOrDefault()?.Meta;
@@ -103,6 +104,7 @@ internal static class Program
         public readonly System.Collections.Generic.SortedSet<string> Ships = new();
         public readonly System.Collections.Generic.SortedSet<string> Loadout = new();
         public readonly System.Collections.Generic.SortedSet<string> Blueprints = new();
+        public readonly System.Collections.Generic.List<string> Loot = new();
         public readonly System.Collections.Generic.List<(long amt, string label)> Money = new();
         public string? SampleMission;
         public readonly System.Collections.Generic.SortedSet<string> MissionTexts = new();
@@ -151,6 +153,7 @@ internal static class Program
                 case EventKind.Friend: s.Friends++; break;
                 case EventKind.Gear: s.Defekt++; break;
                 case EventKind.MissionDone: s.MissionsDone++; break;
+                case EventKind.Loot: s.Loot.Add(e.Detail); break;
             }
             if (e.Ship != null) s.Ships.Add(e.Ship);
         }

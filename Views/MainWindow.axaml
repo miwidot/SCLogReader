@@ -147,6 +147,8 @@
                 Background="{Binding ActiveFilter, Converter={StaticResource FilterBg}, ConverterParameter=Orte}" />
         <Button Classes="chip" Content="♟ Crew" Command="{Binding SetFilterCommand}" CommandParameter="Crew"
                 Background="{Binding ActiveFilter, Converter={StaticResource FilterBg}, ConverterParameter=Crew}" />
+        <Button Classes="chip" Content="◈ Loot" Command="{Binding SetFilterCommand}" CommandParameter="Loot"
+                Background="{Binding ActiveFilter, Converter={StaticResource FilterBg}, ConverterParameter=Loot}" />
         <Button Classes="chip" Content="⋯ Sonst" Command="{Binding SetFilterCommand}" CommandParameter="Sonst"
                 Background="{Binding ActiveFilter, Converter={StaticResource FilterBg}, ConverterParameter=Sonst}" />
       </StackPanel>

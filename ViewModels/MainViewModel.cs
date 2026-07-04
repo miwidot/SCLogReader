@@ -70,6 +70,7 @@ public partial class MainViewModel : ObservableObject
         ["Schiffe"] = new() { EventKind.Vehicle, EventKind.Quantum, EventKind.ShipLoss },
         ["Orte"] = new() { EventKind.Location, EventKind.Jurisdiction, EventKind.Hangar },
         ["Crew"] = new() { EventKind.Party, EventKind.Friend },
+        ["Loot"] = new() { EventKind.Loot },
         ["Sonst"] = new() { EventKind.MedBed, EventKind.Death, EventKind.Impound,
                             EventKind.Loadout, EventKind.Entitlement, EventKind.Inventory, EventKind.Gear, EventKind.Kill,
                             EventKind.Crime, EventKind.Refinery, EventKind.Injury },

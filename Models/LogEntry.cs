@@ -35,6 +35,7 @@ public enum EventKind
     Crime,
     Refinery,
     Injury,
+    Loot,
     Info
 }
 
@@ -92,6 +93,7 @@ public partial class LogEntry : ObservableObject
         EventKind.Crime => "Straftat",
         EventKind.Refinery => "Veredelung",
         EventKind.Injury => "Verletzung",
+        EventKind.Loot => "Loot",
         _ => "Info"
     };
 
@@ -136,6 +138,7 @@ public partial class LogEntry : ObservableObject
         EventKind.Crime => "⚠",
         EventKind.Refinery => "⚗",
         EventKind.Injury => "⚕",
+        EventKind.Loot => "◈",
         _ => "·"
     };
 }
