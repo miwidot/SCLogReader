@@ -5,6 +5,8 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 [SemVer](https://semver.org/lang/de/).
 
 ## [Unreleased]
+
+## [1.1.14] - 2026-07-14
 ### Hinzugefügt
 - **Loot-Erfassung** (`◈ Loot`-Filter): von der Welt gespawnte Items, die du aufsammelst (Kisten/Gegner) — nur echter Loot (`Runtime-spawned`), nicht Kauf/Umräumen. Namen bereinigt, dedupliziert.
 - **Echte Item-Namen** für Loot: rohe Codes werden über die lokale `global.ini` aufgelöst (`rrs_specialist_light_helmet…` → „Arden-SL Helmet", „Karna Rifle", „Pyro RYT Multi-Tool" …).
@@ -86,6 +88,7 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 ## [1.0.0] - 2026-06-28
 ### Hinzugefügt
 - Erste öffentliche Version: Geld/Handel/Käufe, Aufträge mit Namen+Rang, Baupläne, Schiffe/Flotte, Crew, Tode, Ausrüstung, Quantum, Orte; Filter, Geld-Stats, Saldo, JSON/CSV-Export, Auto-Updater, Single-`.exe`.
+
 
 
 
