@@ -116,6 +116,13 @@ public partial class MainViewModel : ObservableObject
             }
         }
 
+        // Loot/Items in der CitizenHQ-Item-DB nachschlagen (Preis dort, sobald verfügbar).
+        if (e.Kind == EventKind.Loot)
+        {
+            OpenUrl("https://citizenhq.space/items?q=" + System.Uri.EscapeDataString(term));
+            return;
+        }
+
         // Baupläne direkt in der CitizenHQ-Bauplan-DB nachschlagen (?q= treibt die Suche).
         // Die Suche macht Substring-Match auf den vollen Namen – daher nur die ersten
         // 2 Wörter senden, sonst liefern abweichende Farb-/Variantennamen 0 Treffer.
