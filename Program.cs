@@ -117,6 +117,7 @@ internal static class Program
     static Sess ScanFile(string file)
     {
         var s = new Sess { Name = Path.GetFileName(file) };
+        Core.Localization.Hint(file);   // Spiel-Wurzel für Item-Namen-Auflösung
         var parser = new LogParser();
         bool first = true;
         foreach (var line in ReadSharedLines(file))

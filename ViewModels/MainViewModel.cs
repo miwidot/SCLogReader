@@ -428,6 +428,7 @@ public partial class MainViewModel : ObservableObject
             : PathFinder.FindBest() ?? @"C:\Program Files\Roberts Space Industries\StarCitizen\LIVE\Game.log";
 
         LogPath = start;
+        Localization.Hint(LogPath);   // Spiel-Wurzel für Item-/Text-Auflösung merken (vor DB-Aufbau)
         if (_settings.Balance > 0) ManualBalance = _settings.Balance.ToString("N0");
         RefreshSessions(selectCurrent: true);
         Status = saved != null && start == saved

@@ -7,6 +7,7 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 ## [Unreleased]
 ### Hinzugefügt
 - **Loot-Erfassung** (`◈ Loot`-Filter): von der Welt gespawnte Items, die du aufsammelst (Kisten/Gegner) — nur echter Loot (`Runtime-spawned`), nicht Kauf/Umräumen. Namen bereinigt, dedupliziert.
+- **Echte Item-Namen** für Loot: rohe Codes werden über die lokale `global.ini` aufgelöst (`rrs_specialist_light_helmet…` → „Arden-SL Helmet", „Karna Rifle", „Pyro RYT Multi-Tool" …).
 
 ## [1.1.13] - 2026-07-05
 ### Behoben

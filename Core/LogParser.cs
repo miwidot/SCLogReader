@@ -266,7 +266,8 @@ public class LogParser
         if (lt.Success)
         {
             if (!lt.Groups["ctx"].Value.Contains("Runtime-spawned")) return null;
-            var name = CleanLootName(lt.Groups["cls"].Value);
+            var cls = lt.Groups["cls"].Value;
+            var name = Localization.ItemName(cls) ?? CleanLootName(cls);   // echter Name aus global.ini, sonst bereinigter Code
             if (name.Length >= 3 && name != _lastLoot) { _lastLoot = name; return new LogEntry { Time = ParseTs(line), Kind = EventKind.Loot, Detail = name }; }
             return null;
         }
