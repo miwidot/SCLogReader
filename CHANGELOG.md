@@ -5,6 +5,8 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 [SemVer](https://semver.org/lang/de/).
 
 ## [Unreleased]
+
+## [1.1.15] - 2026-07-14
 ### Hinzugefügt
 - **Missions-Status farbig**: abgeschlossen = grün, **fehlgeschlagen = rot** (wird jetzt auch mit Namen erfasst), angenommen/neu = blau, zurückgezogen = gelb.
 - **Missions-Nachschlagen zuverlässiger**: sendet nur den **Basis-Namen** vor dem Doppelpunkt (CitizenHQ speichert variable Schiff-/Ziel-Namen als Platzhalter, z.B. „CRITICAL REFUEL REQUEST: Ship") → trifft jetzt statt 0. Nicht übersetzbare deutsche Namen (Ziele mit Variablen) gehen in eine **breite Suche**.
@@ -93,6 +95,7 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 ## [1.0.0] - 2026-06-28
 ### Hinzugefügt
 - Erste öffentliche Version: Geld/Handel/Käufe, Aufträge mit Namen+Rang, Baupläne, Schiffe/Flotte, Crew, Tode, Ausrüstung, Quantum, Orte; Filter, Geld-Stats, Saldo, JSON/CSV-Export, Auto-Updater, Single-`.exe`.
+
 
 
 
