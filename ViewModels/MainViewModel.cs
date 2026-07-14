@@ -111,11 +111,24 @@ public partial class MainViewModel : ObservableObject
             name = name.Trim(' ', ':');
             var enName = Localization.ToEnglish(name, LogPath);   // DE→EN für die englische DB
             if (enName == name && LooksGerman(name))
+            {
                 // Nicht übersetzbar (z.B. Ziel-Name mit Variable wie "Onyx-Facility S3B7 aufsuchen")
                 // → breite Suche statt leerer englischer CitizenHQ-Trefferliste.
                 OpenUrl("https://www.google.com/search?q=" + System.Uri.EscapeDataString("Star Citizen " + name));
-            else if (enName.Length > 1)
-                OpenUrl("https://citizenhq.space/missions?q=" + System.Uri.EscapeDataString(enName));
+                return;
+            }
+            // CitizenHQ speichert variable Schiff-/Ziel-Namen als Platzhalter (z.B. "CRITICAL REFUEL
+            // REQUEST: Ship") → nur den Basis-Namen vor dem ersten ":" senden, sonst 0 Treffer.
+            // Ausnahme: zu generischer Ein-Wort-Basis (z.B. "Target") → vollen Namen lassen.
+            var q = enName;
+            int c = q.IndexOf(':');
+            if (c > 2)
+            {
+                var basePart = q[..c].Trim();
+                if (basePart.Split(' ', System.StringSplitOptions.RemoveEmptyEntries).Length >= 2) q = basePart;
+            }
+            if (q.Length > 1)
+                OpenUrl("https://citizenhq.space/missions?q=" + System.Uri.EscapeDataString(q));
             return;
         }
 

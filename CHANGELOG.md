@@ -7,7 +7,7 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 ## [Unreleased]
 ### Hinzugefügt
 - **Missions-Status farbig**: abgeschlossen = grün, **fehlgeschlagen = rot** (wird jetzt auch mit Namen erfasst), angenommen/neu = blau, zurückgezogen = gelb.
-- **Missions-Nachschlagen**: nicht übersetzbare deutsche Namen (z.B. Ziele mit Variablen wie „Onyx-Facility S3B7 aufsuchen") gehen jetzt in eine **breite Suche** statt in eine leere englische CitizenHQ-Trefferliste.
+- **Missions-Nachschlagen zuverlässiger**: sendet nur den **Basis-Namen** vor dem Doppelpunkt (CitizenHQ speichert variable Schiff-/Ziel-Namen als Platzhalter, z.B. „CRITICAL REFUEL REQUEST: Ship") → trifft jetzt statt 0. Nicht übersetzbare deutsche Namen (Ziele mit Variablen) gehen in eine **breite Suche**.
 ### Behoben
 - **Spielzeit im „Alle Sessions"-Header** zeigte die **Kalender-Spanne** (erste bis letzte Session) statt der echten Spielzeit — bei alten Logs (z.B. 2023) wurden daraus absurde Werte wie 29288h. Jetzt: **Summe der Session-Dauern** + Datumsbereich. Danke an **Saturin**!
 
