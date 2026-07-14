@@ -170,6 +170,7 @@ public static class Database
         public long In, Reward, Out, Purchases, Sales, Trade;
         public DateTime? Start, End;
         public int Sessions;
+        public double PlaytimeSeconds;   // Summe der Session-Dauern (echte Spielzeit, nicht Kalender-Spanne)
         public int MissionsDone;
         public List<string> Ships = new();
     }
@@ -203,6 +204,20 @@ public static class Database
         }
 
         a.Sessions = Convert.ToInt32(Scalar(db, "SELECT COUNT(*) FROM sessions") ?? 0);
+        // Echte Spielzeit = Summe der Session-Dauern. In C# rechnen (julianday verträgt das
+        // 7-stellige "o"-Zeitformat nicht zuverlässig).
+        using (var pc = db.CreateCommand())
+        {
+            pc.CommandText = "SELECT start, end FROM sessions WHERE start IS NOT NULL AND end IS NOT NULL";
+            using var pr = pc.ExecuteReader();
+            while (pr.Read())
+            {
+                if (DateTime.TryParse(pr.GetString(0), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var st) &&
+                    DateTime.TryParse(pr.GetString(1), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var en) &&
+                    en > st)
+                    a.PlaytimeSeconds += (en - st).TotalSeconds;
+            }
+        }
         a.MissionsDone = Convert.ToInt32(Scalar(db, "SELECT COUNT(*) FROM events WHERE kind='MissionDone'") ?? 0);
         if (Scalar(db, "SELECT MIN(time) FROM events") is string mn && DateTime.TryParse(mn, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out var s)) a.Start = s;
         if (Scalar(db, "SELECT MAX(time) FROM events") is string mx && DateTime.TryParse(mx, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out var e)) a.End = e;

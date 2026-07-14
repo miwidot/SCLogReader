@@ -181,7 +181,11 @@ public partial class MainViewModel : ObservableObject
 
     public string SessionSpanText =>
         _sessionStart is { } a && _sessionEnd is { } b
-            ? $"{a.ToLocalTime():dd.MM. HH:mm} → {b.ToLocalTime():HH:mm}   ({Dur(b - a)})"
+            ? _allMode
+                // „Alle Sessions": Datumsbereich + ECHTE Spielzeit (Summe der Session-Dauern),
+                // nicht die Kalender-Spanne (die bei alten Logs riesig wird).
+                ? $"{a.ToLocalTime():dd.MM.yy} → {b.ToLocalTime():dd.MM.yy}   (Σ {Dur(_allPlaytime)} gespielt)"
+                : $"{a.ToLocalTime():dd.MM. HH:mm} → {b.ToLocalTime():HH:mm}   ({Dur(b - a)})"
             : "—";
 
     static string Dur(TimeSpan t) =>
@@ -378,6 +382,7 @@ public partial class MainViewModel : ObservableObject
 
     long _running;
     bool _allMode;     // „Alle Sessions": DB-Basis + Live-Session oben drauf
+    TimeSpan _allPlaytime;   // echte Spielzeit (Summe der Session-Dauern) für „Alle Sessions"
     System.Collections.Generic.List<LogEntry> _dbTop = new();
     System.Collections.Generic.List<LogEntry> _dbTrades = new();
     readonly System.Collections.Generic.List<LogEntry> _liveMoney = new();
@@ -641,6 +646,8 @@ public partial class MainViewModel : ObservableObject
         TotalIn = agg.In; TotalReward = agg.Reward; TotalSales = agg.Sales;
         TotalTrade = agg.Trade; TotalOut = agg.Out; TotalPurchases = agg.Purchases;
         MissionsDone = agg.MissionsDone;
+        _allPlaytime = TimeSpan.FromSeconds(agg.PlaytimeSeconds);
+        OnPropertyChanged(nameof(SessionSpanText));
         foreach (var bp in Database.DistinctBlueprints()) _blueprints.Add(bp);
         OnPropertyChanged(nameof(HasBlueprints));
         OnPropertyChanged(nameof(BlueprintsLine));

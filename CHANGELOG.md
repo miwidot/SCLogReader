@@ -5,6 +5,8 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 [SemVer](https://semver.org/lang/de/).
 
 ## [Unreleased]
+### Behoben
+- **Spielzeit im „Alle Sessions"-Header** zeigte die **Kalender-Spanne** (erste bis letzte Session) statt der echten Spielzeit — bei alten Logs (z.B. 2023) wurden daraus absurde Werte wie 29288h. Jetzt: **Summe der Session-Dauern** + Datumsbereich. Danke an **Saturin**!
 
 ## [1.1.14] - 2026-07-14
 ### Hinzugefügt
