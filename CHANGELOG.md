@@ -7,6 +7,7 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 ## [Unreleased]
 ### Hinzugefügt
 - **Missions-Status farbig**: abgeschlossen = grün, **fehlgeschlagen = rot** (wird jetzt auch mit Namen erfasst), angenommen/neu = blau, zurückgezogen = gelb.
+- **Missions-Nachschlagen**: nicht übersetzbare deutsche Namen (z.B. Ziele mit Variablen wie „Onyx-Facility S3B7 aufsuchen") gehen jetzt in eine **breite Suche** statt in eine leere englische CitizenHQ-Trefferliste.
 ### Behoben
 - **Spielzeit im „Alle Sessions"-Header** zeigte die **Kalender-Spanne** (erste bis letzte Session) statt der echten Spielzeit — bei alten Logs (z.B. 2023) wurden daraus absurde Werte wie 29288h. Jetzt: **Summe der Session-Dauern** + Datumsbereich. Danke an **Saturin**!
 

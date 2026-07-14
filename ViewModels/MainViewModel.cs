@@ -108,12 +108,15 @@ public partial class MainViewModel : ObservableObject
                 var i = name.IndexOf(sep, System.StringComparison.Ordinal);
                 if (i > 2) name = name[..i];
             }
-            name = Localization.ToEnglish(name.Trim(' ', ':'), LogPath);   // DE→EN für die englische DB
-            if (name.Length > 1)
-            {
-                OpenUrl("https://citizenhq.space/missions?q=" + System.Uri.EscapeDataString(name));
-                return;
-            }
+            name = name.Trim(' ', ':');
+            var enName = Localization.ToEnglish(name, LogPath);   // DE→EN für die englische DB
+            if (enName == name && LooksGerman(name))
+                // Nicht übersetzbar (z.B. Ziel-Name mit Variable wie "Onyx-Facility S3B7 aufsuchen")
+                // → breite Suche statt leerer englischer CitizenHQ-Trefferliste.
+                OpenUrl("https://www.google.com/search?q=" + System.Uri.EscapeDataString("Star Citizen " + name));
+            else if (enName.Length > 1)
+                OpenUrl("https://citizenhq.space/missions?q=" + System.Uri.EscapeDataString(enName));
+            return;
         }
 
         // Loot/Items in der CitizenHQ-Item-DB nachschlagen (Preis dort, sobald verfügbar).
@@ -150,6 +153,17 @@ public partial class MainViewModel : ObservableObject
 
     [RelayCommand]
     private void OpenChangelog() => OpenUrl("https://github.com/miwidot/SCLogReader/releases");
+
+    // Grobe Heuristik: deutscher (nicht übersetzter) Missionsname? Dann taugt die englische DB nicht.
+    static bool LooksGerman(string s)
+    {
+        if (s.IndexOfAny(new[] { 'ä', 'ö', 'ü', 'ß', 'Ä', 'Ö', 'Ü' }) >= 0) return true;
+        foreach (var w in new[] { "aufsuchen", "besiegen", "ausschalten", "zerstör", "sammeln", "bergen",
+                                  "liefern", "abholen", "Rückkehr", "verteidig", "eskortier", "Trümmer",
+                                  "erledigen", "vernichten", "einsammeln", "beschützen", "untersuchen" })
+            if (s.Contains(w, System.StringComparison.OrdinalIgnoreCase)) return true;
+        return false;
+    }
 
     static void OpenUrl(string url)
     {
