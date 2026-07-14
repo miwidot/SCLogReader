@@ -1,4 +1,5 @@
 using System;
+using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace SCLogReader.Models;
@@ -98,6 +99,28 @@ public partial class LogEntry : ObservableObject
     };
 
     public string AmountText => Amount != 0 ? $"{Amount:N0}" : "";
+
+    // Farbe der DETAIL-Zelle: Missions-Status farbig (grün=fertig, rot=fehlgeschlagen,
+    // blau=angenommen/neu, gelb=zurückgezogen), sonst Standard.
+    static readonly IBrush _detailDefault = new SolidColorBrush(Color.Parse("#E6EDF3"));
+    static readonly IBrush _missGreen = new SolidColorBrush(Color.Parse("#3FB950"));
+    static readonly IBrush _missRed = new SolidColorBrush(Color.Parse("#F85149"));
+    static readonly IBrush _missBlue = new SolidColorBrush(Color.Parse("#58A6FF"));
+    static readonly IBrush _missAmber = new SolidColorBrush(Color.Parse("#D29922"));
+
+    public IBrush StatusBrush
+    {
+        get
+        {
+            if (Kind == EventKind.MissionDone) return _missGreen;
+            if (Kind != EventKind.Mission) return _detailDefault;
+            var d = Detail ?? "";
+            if (d.StartsWith("Auftrag abgeschlossen") || d.StartsWith("Contract Complete")) return _missGreen;
+            if (d.StartsWith("Auftrag fehlgeschlagen") || d.StartsWith("Contract Failed")) return _missRed;
+            if (d.StartsWith("Auftrag zurückgezogen")) return _missAmber;
+            return _missBlue;   // angenommen / Neuer Auftrag / New Objective
+        }
+    }
 
     // Mitlaufender Kontostand nach diesem Ereignis (nur Geld-Events)
     [ObservableProperty] private long balanceAfter;

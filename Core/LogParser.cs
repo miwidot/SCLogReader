@@ -68,7 +68,7 @@ public class LogParser
 
     // Auftrag/Contract – vollständiger Text (Name, Rang, Route), nicht am ':' abschneiden.
     static readonly Regex MissionLine =
-        new(@"Added notification ""(?<full>(?:Neuer Auftrag|Auftrag (?:angenommen|abgeschlossen|geteilt|zurückgezogen)|Contract (?:Accepted|Complete)|New Objective)[^""]*)",
+        new(@"Added notification ""(?<full>(?:Neuer Auftrag|Auftrag (?:angenommen|abgeschlossen|fehlgeschlagen|geteilt|zurückgezogen)|Contract (?:Accepted|Complete|Failed)|New Objective)[^""]*)",
             RegexOptions.Compiled);
 
     // Blaupause erhalten (mit Namen).

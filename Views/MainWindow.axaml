@@ -211,7 +211,7 @@
             <DataGridTemplateColumn.CellTemplate>
               <DataTemplate x:DataType="m:LogEntry">
                 <TextBlock Text="{Binding Detail}" Margin="2,0,8,0" VerticalAlignment="Center"
-                           TextTrimming="CharacterEllipsis" Foreground="#E6EDF3" />
+                           TextTrimming="CharacterEllipsis" Foreground="{Binding StatusBrush}" />
               </DataTemplate>
             </DataGridTemplateColumn.CellTemplate>
           </DataGridTemplateColumn>
