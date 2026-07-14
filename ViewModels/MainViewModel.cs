@@ -120,15 +120,15 @@ public partial class MainViewModel : ObservableObject
             // CitizenHQ speichert variable Schiff-/Ziel-Namen als Platzhalter (z.B. "CRITICAL REFUEL
             // REQUEST: Ship") → nur den Basis-Namen vor dem ersten ":" senden, sonst 0 Treffer.
             // Ausnahme: zu generischer Ein-Wort-Basis (z.B. "Target") → vollen Namen lassen.
-            var q = enName;
-            int c = q.IndexOf(':');
+            var mq = enName;
+            int c = mq.IndexOf(':');
             if (c > 2)
             {
-                var basePart = q[..c].Trim();
-                if (basePart.Split(' ', System.StringSplitOptions.RemoveEmptyEntries).Length >= 2) q = basePart;
+                var basePart = mq[..c].Trim();
+                if (basePart.Split(' ', System.StringSplitOptions.RemoveEmptyEntries).Length >= 2) mq = basePart;
             }
-            if (q.Length > 1)
-                OpenUrl("https://citizenhq.space/missions?q=" + System.Uri.EscapeDataString(q));
+            if (mq.Length > 1)
+                OpenUrl("https://citizenhq.space/missions?q=" + System.Uri.EscapeDataString(mq));
             return;
         }
 
