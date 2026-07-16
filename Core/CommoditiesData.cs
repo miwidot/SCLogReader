@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace SCLogReader.Core;
 
-/// <summary>Auto-generiert aus scunpacked (resources/commodities+resources.json). resourceGUID -> Warenname.</summary>
+/// <summary>Auto-generiert via tools/gen-commodities.ps1 aus scunpacked. resourceGUID -> Warenname.</summary>
 public static partial class Commodities
 {
     static readonly Dictionary<string, string> Map = new()
@@ -19,6 +19,7 @@ public static partial class Commodities
         ["03d7f182-b363-4e7c-998d-e6d6900723ab"] = "<= PLACEHOLDER =>",
         ["03edfc1a-9a7b-488d-bc15-d1c7a9dec612"] = "<= PLACEHOLDER =>",
         ["0503e4d8-91e9-4f36-9646-aa467ea56c80"] = "AsteroidCTypeMineableRock_Silicon",
+        ["0553f1de-4003-466d-8df9-5dc1ec59b1cd"] = "<= PLACEHOLDER =>",
         ["06aec6f9-e6c9-40f0-be9d-8acaa2d2a4a6"] = "FelsicMineableRock",
         ["06b6fb5f-ad7a-437f-9e03-ddbd6e96abde"] = "Large Container",
         ["06cafea0-49fe-4dce-b0f0-dc583316c66d"] = "Taranite",
@@ -68,7 +69,7 @@ public static partial class Commodities
         ["13de3221-9a20-4695-81a2-ca93007e848f"] = "FelsicMineableRock_Silicon",
         ["143ba902-aa88-4f44-a8bc-d110ae39a555"] = "Wreckage",
         ["1447fd18-aaac-4788-ae2f-55055dcc31cf"] = "Silnex",
-        ["14b738eb-fe9f-4822-953d-c00329bd7141"] = "<= PLACEHOLDER =>",
+        ["14b738eb-fe9f-4822-953d-c00329bd7141"] = "Organs",
         ["15fe1d6a-8e3e-41ad-b4b0-8a5960d75f2d"] = "Oxygen",
         ["160b32ad-7254-497d-a081-87177dc54071"] = "AsteroidQTypeMineableRock_Titanium",
         ["16314a82-085d-415f-a4ae-f0a0c077022f"] = "Lastaprene",
@@ -98,6 +99,7 @@ public static partial class Commodities
         ["1da6b0e3-5ebe-43c0-a11f-97a907a1d324"] = "AsteroidSTypeMineableRock_Tin",
         ["1dfe35db-c9d4-4947-8515-9c42a076ae05"] = "<= PLACEHOLDER =>",
         ["1e4ca7fc-bb70-4080-b94f-7ad24ba4f520"] = "Pitambu",
+        ["1e5e3c87-5e4c-4cac-8a17-6a46f97abb8a"] = "Yormandi Eye",
         ["1f6908a2-80b0-48c1-ad76-d93a6afcbfd7"] = "Spectre",
         ["1fc77a3c-6d4f-4e09-a77b-9a30c23c6fa7"] = "AsteroidMTypeMineableRock_Silicon",
         ["1fdb2e84-1622-4685-8194-2d108498d90f"] = "Ship Ammunition - Size 1",
@@ -180,6 +182,7 @@ public static partial class Commodities
         ["3848c27d-49cc-4fdb-9a18-e93770bc8bc2"] = "Bexalite (Raw)",
         ["386af763-f67f-42c6-9142-8c327b806cd8"] = "CaveLargeMineableRock",
         ["3871740a-f82f-445d-a2e5-8163d1405733"] = "Gasping Weevil Eggs",
+        ["38891875-7846-4fd6-98f2-aaa3f038cddf"] = "<= PLACEHOLDER =>",
         ["392b4dca-449a-4d4d-8fef-beab024d9ee7"] = "Lindinium",
         ["3930b056-8537-4200-bcce-f8620054fc9a"] = "AsteroidCTypeMineableRock_Tin",
         ["393c2115-5ba5-4748-9664-3f5a7998a816"] = "Ship Ammunition - Size 3",
@@ -194,6 +197,7 @@ public static partial class Commodities
         ["3e5fdc37-cb59-4fd3-8168-e3c538ab9722"] = "Hadanite",
         ["3e9ecb49-dee6-433d-b7d4-cef0dbf31931"] = "<= PLACEHOLDER =>",
         ["3f42925b-1ada-4dc2-9cbd-5d6c1f2e2653"] = "AsteroidMTypeMineableRock_Iron",
+        ["3f68b965-d20f-4996-8719-c15211c49456"] = "<= PLACEHOLDER =>",
         ["3f856590-b4db-48dc-967f-7563ad1de5b0"] = "<= PLACEHOLDER =>",
         ["3fca2f33-4681-4ae8-992e-8b00df46c006"] = "AsteroidCTypeMineableRock_Tungsten",
         ["4061667e-d30e-4415-b073-ffebd3e5fa16"] = "WiDoW",
@@ -414,7 +418,7 @@ public static partial class Commodities
         ["89eee857-5d57-4aed-8ebc-af0871c62b11"] = "Small Container",
         ["8b2ccbe4-518b-4425-8709-f0d401c51344"] = "AtacamiteMineableRock_Copper",
         ["8b6a4ea8-5052-42aa-94ec-3fb8182d68c0"] = "Gold",
-        ["8ba78e89-0832-48c2-b8ab-4eaa7d4bba42"] = "Vlk_Fang",
+        ["8ba78e89-0832-48c2-b8ab-4eaa7d4bba42"] = "Valakkar Fang",
         ["8bc60017-e4b6-47b1-bbe0-f2eb944fdeaf"] = "Detatrine",
         ["8c703def-f131-4797-a669-489d47b1b89b"] = "<= PLACEHOLDER =>",
         ["8cbe96c4-9222-4241-9d57-3c6b0f1dba90"] = "Carinite",
@@ -429,6 +433,7 @@ public static partial class Commodities
         ["8ea47c7e-f70f-469d-abc2-911cc5013854"] = "TS-2",
         ["8ee121cc-aabb-4394-87dd-02552d228d0b"] = "Nitrogen",
         ["8f23067e-cb00-42ad-bd1d-7af8d719ccc4"] = "AsteroidMTypeMineableRock_Tin",
+        ["8f326db5-64e8-4399-be7d-16bdde99e05e"] = "Rock Slab",
         ["8f8dd98d-3de8-47ec-ba3c-88a94de377a7"] = "ObsidianMineableRock_Titanium",
         ["8ff05e78-ff3e-49a9-a19d-bd332eb1636c"] = "ActorLootbox_Prelude_Vanduul_001",
         ["905f6075-6c50-4353-9042-eba5a09bef3e"] = "E'tam",
@@ -478,11 +483,13 @@ public static partial class Commodities
         ["999b60d7-2d77-4cef-8cf3-83df24c8a498"] = "MineableRock_AsteroidLegendary_Savrilium_RCD_small",
         ["999e3149-fd10-49ac-914f-8911e61c6122"] = "Bexalite",
         ["9ade5d70-fab6-43d5-9f12-72394fa2d5a0"] = "Spicule",
+        ["9aea8157-08dd-4498-b871-dbe114c563f1"] = "<= PLACEHOLDER =>",
         ["9afd1cd3-ce6b-4b0a-abdd-cd7d479ec360"] = "Polar",
         ["9b47bacf-8efa-42e2-8d84-dee64983a00a"] = "Aphorite",
         ["9b8d6f07-8eb2-4760-a62f-72b363169aec"] = "<= PLACEHOLDER =>",
         ["9c09556c-a9c7-4af8-893d-7a3cd6152746"] = "Agricultural Supplies",
         ["9c32a061-eb28-4b31-9590-3709808e7857"] = "<= PLACEHOLDER =>",
+        ["9c936b23-691c-4b72-b0d7-8d2b3e486dbd"] = "Standard Container",
         ["9c9b1fde-10ee-4707-a391-5ea8f03e8178"] = "Bioplastic",
         ["9ce11781-40ca-4199-9a3a-8f8b852eb1ae"] = "<= PLACEHOLDER =>",
         ["9d235ec6-79d5-4443-a826-440b3d2e71fa"] = "Feynmaline",
@@ -652,6 +659,7 @@ public static partial class Commodities
         ["d58c8d01-6b52-4a2a-bb11-7ef8e2ebcc7f"] = "DeconPen Xtra",
         ["d60f0010-3a22-4c22-83a1-9c828e1bcafe"] = "<= PLACEHOLDER =>",
         ["d640865f-4b87-427f-9586-1ff7b069ca15"] = "MineableRock_SurfaceLegendary_TEMPLATE",
+        ["d67142d9-bb60-424a-b63b-ee05e1b3375d"] = "<= PLACEHOLDER =>",
         ["d6ed474d-aea8-4fc1-9052-7f6404fbb149"] = "Wreckage",
         ["d76ea7ef-5116-488c-93d3-71e02bada13d"] = "Savrilium (Ore)",
         ["d7d11ac0-b1bc-46f7-b8f7-5e42eafa1311"] = "Wreckage",
@@ -728,6 +736,7 @@ public static partial class Commodities
         ["efe6f1d2-0085-4d47-a9b7-6c7a1762fcce"] = "Standard Container",
         ["f0395a51-f847-4915-833a-b04fa36e7480"] = "QuantaniumMineableRock",
         ["f0c1f30b-001c-4a80-ac20-27df27183056"] = "Aslarite (Raw)",
+        ["f0e1ff2b-a99a-49a8-befc-54b5c4ec9d77"] = "<= PLACEHOLDER =>",
         ["f1604838-e521-49e6-87d0-3ef4d02db4c0"] = "Freeze",
         ["f1763688-a3b6-496e-8d62-3e40e2098661"] = "JS-400",
         ["f3379bda-0520-4c75-920a-c29a50eb6b50"] = "Janalite",

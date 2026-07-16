@@ -5,6 +5,8 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 [SemVer](https://semver.org/lang/de/).
 
 ## [Unreleased]
+### Geändert
+- **Commodity-Tabelle auf Patch 4.9** aktualisiert (763 Waren, +9 neue aus scunpacked `4.9.0-LIVE`).
 
 ## [1.1.15] - 2026-07-14
 ### Hinzugefügt
