@@ -5,6 +5,8 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 [SemVer](https://semver.org/lang/de/).
 
 ## [Unreleased]
+
+## [1.1.17] - 2026-07-19
 ### Behoben
 - **Kontostand/„Erwartet" war falsch**: Der eingetragene Wert wurde als *Startwert vor der gesamten Historie* behandelt — es wurden **alle je geloggten Bewegungen** draufaddiert. Da die Log-Historie zudem lückenhaft ist (SC löscht alte Backups), war die Erwartung doppelt daneben. Jetzt gilt der Wert **ab dem Zeitpunkt des Eintrags**: nur **spätere** Bewegungen werden angerechnet, und die Saldo-Spalte bleibt für ältere Ereignisse bewusst leer statt falsch.
 
@@ -101,6 +103,7 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 ## [1.0.0] - 2026-06-28
 ### Hinzugefügt
 - Erste öffentliche Version: Geld/Handel/Käufe, Aufträge mit Namen+Rang, Baupläne, Schiffe/Flotte, Crew, Tode, Ausrüstung, Quantum, Orte; Filter, Geld-Stats, Saldo, JSON/CSV-Export, Auto-Updater, Single-`.exe`.
+
 
 
 
