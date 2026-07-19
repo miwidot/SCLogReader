@@ -5,6 +5,8 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 [SemVer](https://semver.org/lang/de/).
 
 ## [Unreleased]
+### Behoben
+- **Kontostand/„Erwartet" war falsch**: Der eingetragene Wert wurde als *Startwert vor der gesamten Historie* behandelt — es wurden **alle je geloggten Bewegungen** draufaddiert. Da die Log-Historie zudem lückenhaft ist (SC löscht alte Backups), war die Erwartung doppelt daneben. Jetzt gilt der Wert **ab dem Zeitpunkt des Eintrags**: nur **spätere** Bewegungen werden angerechnet, und die Saldo-Spalte bleibt für ältere Ereignisse bewusst leer statt falsch.
 
 ## [1.1.16] - 2026-07-17
 ### Geändert

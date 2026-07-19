@@ -90,7 +90,7 @@
             <TextBox Width="120" Padding="8,5" CornerRadius="6" Background="#0D1117" BorderBrush="#30363D"
                      FontFamily="Cascadia Code, Consolas, monospace" FontWeight="Bold" FontSize="14"
                      Text="{Binding ManualBalance}" Watermark="aUEC"
-                     ToolTip.Tip="Echten aUEC-Kontostand eintragen, dann ✓ Setzen" />
+                     ToolTip.Tip="Deinen AKTUELLEN aUEC-Kontostand eintragen, dann ✓ Setzen.&#10;Ab dann werden nur neue Bewegungen angerechnet (die alte Historie ist lückenhaft)." />
             <Button Classes="accent" Padding="10,5" VerticalAlignment="Stretch"
                     Command="{Binding SetBalanceCommand}" Content="✓ Setzen"
                     ToolTip.Tip="Speichern und Saldo neu berechnen" />

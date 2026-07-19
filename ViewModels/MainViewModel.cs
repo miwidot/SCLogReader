@@ -190,10 +190,13 @@ public partial class MainViewModel : ObservableObject
         var v = StartBalance();
         ManualBalance = v > 0 ? v.ToString("N0") : "";   // mit Tausenderpunkten anzeigen
         _settings.Balance = v;
+        // Zeitpunkt festhalten: der Wert gilt ab JETZT. Nur spätere Bewegungen werden
+        // angerechnet (sonst würde die lückenhafte Historie draufaddiert → falsche Erwartung).
+        _settings.BalanceSetAt = v > 0 ? DateTime.UtcNow : null;
         Settings.Save(_settings);
         RecomputeBalances();
         OnPropertyChanged(nameof(AccountText));
-        Status = v > 0 ? $"Kontostand gesetzt: {v:N0} aUEC" : "Kontostand geleert";
+        Status = v > 0 ? $"Kontostand gesetzt: {v:N0} aUEC (ab jetzt)" : "Kontostand geleert";
         BalanceSaved = true;   // grünes OK-Signal am Button, blendet nach 2s aus
         Avalonia.Threading.DispatcherTimer.RunOnce(() => BalanceSaved = false, System.TimeSpan.FromSeconds(2));
     }
@@ -381,8 +384,11 @@ public partial class MainViewModel : ObservableObject
     }
 
     // Log-Bewegung mit Vorzeichen (grün/rot via Converter im XAML)
-    public string NetBalanceText => $"Log-Bewegung {NetAll:+#,##0;-#,##0;0} aUEC";
-    public long NetSign => NetAll;
+    // Bezieht sich auf den Kontostand: nur Bewegungen SEIT dem Eintrag erklären den erwarteten Stand.
+    public string NetBalanceText => _settings.BalanceSetAt is null
+        ? "Kontostand setzen für Verlauf"
+        : $"seit Eintrag {NetSinceBalance:+#,##0;-#,##0;0} aUEC";
+    public long NetSign => NetSinceBalance;
     public string FlowText => $"▼ Ein {IncomeAll:N0}    ▲ Aus {SpendAll:N0}";
     public string TradeText => $"⇄ Handel {TotalSales + TotalTrade:N0}    ↧ Käufe {TotalPurchases:N0}";
     public bool HasMissions => MissionsDone > 0;
@@ -420,25 +426,48 @@ public partial class MainViewModel : ObservableObject
         return long.TryParse(digits, out var v) ? v : 0;
     }
 
-    public long ExpectedBalance => StartBalance() + NetAll;
-    public string ExpectedText => StartBalance() > 0 ? $"≈ {ExpectedBalance:N0} aUEC" : "Start oben eintragen";
+    /// <summary>Summe der Geld-Bewegungen NACH dem Kontostand-Eintrag. Nur die zählen —
+    /// der eingetragene Wert ist der Stand von damals, nicht der Start der ganzen Historie.</summary>
+    public long NetSinceBalance
+    {
+        get
+        {
+            if (_settings.BalanceSetAt is not { } since) return 0;
+            long sum = 0;
+            foreach (var e in Events)
+                if (IsMoney(e.Kind) && e.Time > since) sum += e.Amount;
+            return sum;
+        }
+    }
+
+    public long ExpectedBalance => StartBalance() + NetSinceBalance;
+    public string ExpectedText =>
+        StartBalance() <= 0 ? "Kontostand eintragen"
+        : _settings.BalanceSetAt is null ? "≈ " + StartBalance().ToString("N0") + " aUEC (neu setzen für Verlauf)"
+        : $"≈ {ExpectedBalance:N0} aUEC";
 
     static bool IsMoney(EventKind k) => k is EventKind.TransferIn or EventKind.TransferOut
         or EventKind.MissionReward or EventKind.Purchase or EventKind.Sale or EventKind.Trade or EventKind.Fine;
 
-    // Saldo-Verlauf neu berechnen (z.B. wenn Startwert geändert wird)
+    // Saldo-Verlauf neu berechnen. Saldo gibt es nur für Ereignisse NACH dem Kontostand-Eintrag —
+    // davor ist er unbekannt (Historie lückenhaft), daher bewusst leer statt falsch.
     void RecomputeBalances()
     {
+        var since = _settings.BalanceSetAt;
         long run = StartBalance();
         for (int i = Events.Count - 1; i >= 0; i--)   // ältestes zuerst
         {
             var e = Events[i];
             if (!IsMoney(e.Kind)) continue;
+            if (since is null || e.Time <= since.Value) { e.HasBalance = false; continue; }
             run += e.Amount;
             e.BalanceAfter = run;
             e.HasBalance = true;
         }
         _running = run;
+        OnPropertyChanged(nameof(NetSinceBalance));
+        OnPropertyChanged(nameof(NetBalanceText));
+        OnPropertyChanged(nameof(NetSign));
         OnPropertyChanged(nameof(ExpectedText));
         OnPropertyChanged(nameof(ExpectedBalance));
     }
@@ -696,7 +725,7 @@ public partial class MainViewModel : ObservableObject
 
         _sessionStart = agg.Start;
         _sessionEnd = agg.End;
-        _running = StartBalance() + NetAll;
+        _running = ExpectedBalance;   // Stand vom Eintrag + Bewegungen danach (nicht die ganze Historie)
 
         foreach (var n in new[] { nameof(IncomeAll), nameof(SpendAll), nameof(NetAll), nameof(NetBalanceText),
                  nameof(NetSign), nameof(FlowText), nameof(TradeText), nameof(ExpectedText), nameof(ExpectedBalance),

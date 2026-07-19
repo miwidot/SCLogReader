@@ -8,6 +8,11 @@ public class AppSettings
 {
     public string? LogPath { get; set; }
     public long Balance { get; set; }   // echter Kontostand (manuell eingetragen)
+
+    /// <summary>Zeitpunkt des Kontostand-Eintrags. Nur Bewegungen DANACH werden angerechnet —
+    /// der eingetragene Wert ist der Stand von JETZT, nicht der Startwert der ganzen Historie
+    /// (die ist ohnehin lückenhaft, weil SC alte Logs löscht).</summary>
+    public DateTime? BalanceSetAt { get; set; }
 }
 
 /// <summary>Merkt sich Einstellungen (Log-Pfad, Kontostand) über Starts hinweg.</summary>
