@@ -108,6 +108,11 @@ public class LogParser
     static readonly Regex LootStore =
         new(@"<OnInventoryStoreItem> Entity\[[^ ]+ - Class\((?<cls>[^)]+)\) - Context\((?<ctx>[^)]*)\)", RegexOptions.Compiled);
 
+    // Loot, das direkt ausgerüstet/gegriffen wird (Armor-Swap am Körper, Ghost-Hollow-Style):
+    // "Equip looting entity[<class>_<entityId>]" — NICHT "equip from Inventory" (eigenes Zeug).
+    static readonly Regex EquipLoot =
+        new(@"<EquipItem> Equip looting entity\[(?<cls>[A-Za-z0-9_]+)_\d{6,}\]", RegexOptions.Compiled);
+
     // Bußgeld gezahlt (mit Betrag) – echtes aUEC raus, fließt in den Saldo.
     static readonly Regex FineLine =
         new(@"Added notification ""Strafe gezahlt:\s*(?<amt>[\d.,]+)", RegexOptions.Compiled);
@@ -268,6 +273,16 @@ public class LogParser
             if (!lt.Groups["ctx"].Value.Contains("Runtime-spawned")) return null;
             var cls = lt.Groups["cls"].Value;
             var name = Localization.ItemName(cls) ?? CleanLootName(cls);   // echter Name aus global.ini, sonst bereinigter Code
+            if (name.Length >= 3 && name != _lastLoot) { _lastLoot = name; return new LogEntry { Time = ParseTs(line), Kind = EventKind.Loot, Detail = name }; }
+            return null;
+        }
+
+        // Loot, das direkt vom Boden/Leiche ausgerüstet wird (Armor-Swap) – nicht im Inventar
+        var el = EquipLoot.Match(line);
+        if (el.Success)
+        {
+            var cls = el.Groups["cls"].Value;
+            var name = Localization.ItemName(cls) ?? CleanLootName(cls);
             if (name.Length >= 3 && name != _lastLoot) { _lastLoot = name; return new LogEntry { Time = ParseTs(line), Kind = EventKind.Loot, Detail = name }; }
             return null;
         }

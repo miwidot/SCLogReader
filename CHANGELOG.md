@@ -5,6 +5,8 @@ Alle nennenswerten Änderungen an diesem Projekt. Format nach
 [SemVer](https://semver.org/lang/de/).
 
 ## [Unreleased]
+### Hinzugefügt
+- **Loot vollständiger**: auch **direkt ausgerüstetes** Gear wird erfasst (`Equip looting entity` — Armor-Swap am Körper, z.B. Ghost-Hollow-Farming). Vorher nur ins Inventar gestautes Zeug (`OnInventoryStoreItem`). Fängt jetzt Rüstung/Waffen, die du direkt anziehst/greifst.
 
 ## [1.1.17] - 2026-07-19
 ### Behoben
